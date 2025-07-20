@@ -3,6 +3,13 @@
 
 #include "esphome.h"
 #include "esphome/components/uart/uart.h"
+#if defined(USE_ESP32_FRAMEWORK_ESP_IDF)
+#include "esphome/components/uart/uart_component_esp_idf.h"
+#include <driver/uart.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
+#include <freertos/queue.h>
+#endif
 #include <cstring>
 #include <cmath>
 #include <vector>
@@ -36,10 +43,19 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
     delay(100);
     this->write_str("AT+SETTING\n");
     delay(100);
+#if defined(USE_ESP32_FRAMEWORK_ESP_IDF)
+    if (auto *idf = dynamic_cast<uart::IDFUARTComponent *>(this->parent_)) {
+      uart_num_ = idf->get_hw_serial_number();
+      uart_queue_ = idf->get_uart_event_queue();
+      xTaskCreatePinnedToCore(uart_task, "sensy_uart", 4096, this, 1, &task_handle_, 1);
+    }
+#endif
   }
 
   void loop() override {
+#if !defined(USE_ESP32_FRAMEWORK_ESP_IDF)
     read_uart_();
+#endif
     parse_ring_();
   }
 
@@ -90,12 +106,20 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
  protected:
   static const uint8_t HEADER[8];
   static const size_t RING_BUFFER_SIZE = 10240;
-  uint8_t ring_[RING_BUFFER_SIZE];
-  size_t head_ = 0;
-  size_t tail_ = 0;
+  volatile uint8_t ring_[RING_BUFFER_SIZE];
+  volatile size_t head_ = 0;
+  volatile size_t tail_ = 0;
 
   char ascii_buffer_[64];
   size_t ascii_pos_ = 0;
+#if defined(USE_ESP32_FRAMEWORK_ESP_IDF)
+  static void uart_task(void *param);
+  void uart_task_loop_();
+  void write_ring_task_(const uint8_t *data, size_t len);
+  uart_port_t uart_num_{};
+  QueueHandle_t *uart_queue_{nullptr};
+  TaskHandle_t task_handle_{nullptr};
+#endif
 
   enum ParseState {
     SEARCHING_HEADER,
@@ -141,6 +165,54 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
       }
     }
   }
+
+#if defined(USE_ESP32_FRAMEWORK_ESP_IDF)
+  static void uart_task(void *param) {
+    auto *self = static_cast<SensyTwoComponent *>(param);
+    self->uart_task_loop_();
+  }
+
+  void uart_task_loop_() {
+    uart_event_t event;
+    uint8_t temp[128];
+    while (true) {
+      if (xQueueReceive(*uart_queue_, &event, portMAX_DELAY)) {
+        if (event.type == UART_DATA) {
+          int len = uart_read_bytes(uart_num_, temp, event.size, portMAX_DELAY);
+          if (len > 0) {
+            write_ring_task_(temp, len);
+            for (int i = 0; i < len; i++) {
+              char c = static_cast<char>(temp[i]);
+              if (c == '\n' || ascii_pos_ >= sizeof(ascii_buffer_) - 1) {
+                ascii_buffer_[ascii_pos_] = '\0';
+                parse_ascii_(ascii_buffer_);
+                ascii_pos_ = 0;
+              } else if (c != '\r') {
+                ascii_buffer_[ascii_pos_++] = c;
+              }
+            }
+            this->enable_loop_soon();
+          }
+        } else if (event.type == UART_FIFO_OVF || event.type == UART_BUFFER_FULL) {
+          uart_flush_input(uart_num_);
+          xQueueReset(*uart_queue_);
+        }
+      }
+    }
+  }
+
+  void write_ring_task_(const uint8_t *data, size_t len) {
+    for (size_t i = 0; i < len; ++i) {
+      size_t next = (head_ + 1) % RING_BUFFER_SIZE;
+      if (next != tail_) {
+        ring_[head_] = data[i];
+        head_ = next;
+      } else {
+        break;
+      }
+    }
+  }
+#endif
 
   void write_ring_(const uint8_t *data, size_t len) {
     for (size_t i = 0; i < len; ++i) {
