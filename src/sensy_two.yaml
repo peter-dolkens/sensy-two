@@ -10,7 +10,9 @@ esphome:
     - components/sensy_two/sensy_two_component.h
 
 esp32:
-  board: esp32dev
+  board: esp32-s3-devkitc-1
+  framework:
+    type: esp-idf
 
 external_components:
   - source:
