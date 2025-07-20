@@ -4,6 +4,7 @@
 #include "esphome.h"
 #include <cstring>
 #include <cmath>
+#include <vector>
 
 namespace esphome {
 namespace sensytwo {
@@ -49,6 +50,18 @@ class SensyTwoComponent : public Component, public UARTDevice {
 
   std::vector<sensor::Sensor *> get_all_sensors() { return get_target_sensors(); }
 
+  std::vector<text_sensor::TextSensor *> get_text_sensors() {
+    return {radar_firmware, radar_mac};
+  }
+
+  void restart_module() { this->write_str("AT+RESET\n"); }
+
+  void reset_points() { this->write_str("AT+SETTING\n"); }
+
+  void read_firmware() { this->write_str("AT+FIRMWARE?\n"); }
+
+  void read_mac_address() { this->write_str("AT+MAC?\n"); }
+
   sensor::Sensor *t1_x = new sensor::Sensor();
   sensor::Sensor *t1_y = new sensor::Sensor();
   sensor::Sensor *t1_angle = new sensor::Sensor();
@@ -70,12 +83,18 @@ class SensyTwoComponent : public Component, public UARTDevice {
   sensor::Sensor *t3_distance_resolution = new sensor::Sensor();
   sensor::Sensor *t3_distance = new sensor::Sensor();
 
+  text_sensor::TextSensor *radar_firmware = new text_sensor::TextSensor();
+  text_sensor::TextSensor *radar_mac = new text_sensor::TextSensor();
+
  protected:
   static const uint8_t HEADER[8];
   static const size_t RING_BUFFER_SIZE = 10240;
   uint8_t ring_[RING_BUFFER_SIZE];
   size_t head_ = 0;
   size_t tail_ = 0;
+
+  char ascii_buffer_[64];
+  size_t ascii_pos_ = 0;
 
   enum ParseState {
     SEARCHING_HEADER,
@@ -109,6 +128,16 @@ class SensyTwoComponent : public Component, public UARTDevice {
     while (this->available()) {
       size_t n = this->read_array(temp, sizeof(temp));
       write_ring_(temp, n);
+      for (size_t i = 0; i < n; i++) {
+        char c = static_cast<char>(temp[i]);
+        if (c == '\n' || ascii_pos_ >= sizeof(ascii_buffer_) - 1) {
+          ascii_buffer_[ascii_pos_] = '\0';
+          parse_ascii_(ascii_buffer_);
+          ascii_pos_ = 0;
+        } else if (c != '\r') {
+          ascii_buffer_[ascii_pos_++] = c;
+        }
+      }
     }
   }
 
@@ -255,6 +284,14 @@ class SensyTwoComponent : public Component, public UARTDevice {
       t3_speed->publish_state(speed);
       t3_distance_resolution->publish_state(0);
       t3_distance->publish_state(distance);
+    }
+  }
+
+  void parse_ascii_(const char *line) {
+    if (strncmp(line, "FW:", 3) == 0) {
+      radar_firmware->publish_state(line + 3);
+    } else if (strncmp(line, "MAC:", 4) == 0) {
+      radar_mac->publish_state(line + 4);
     }
   }
 };

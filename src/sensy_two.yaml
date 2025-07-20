@@ -3,6 +3,35 @@ esphome:
   includes:
     - components/sensy-two/sensy_two_component.h
 
+wifi:
+  ap:
+    ssid: "I am Sensy!"
+    ap_timeout: 1min
+
+captive_portal:
+
+esp32_improv:
+  authorizer: none
+  identify_duration: 10s
+  wifi_timeout: 1min
+  on_provisioned:
+    then:
+      - lambda: 'id(sensy_component)->read_firmware();'
+      - delay: 500ms
+      - lambda: 'id(sensy_component)->read_mac_address();'
+
+api:
+
+logger:
+  level: VERY_VERBOSE
+
+web_server:
+  port: 80
+  log: false
+
+ota:
+  platform: esphome
+
 uart:
   id: sensy_uart
   baud_rate: 115200
@@ -13,8 +42,44 @@ custom_component:
   - lambda: |-
       auto sensy = new esphome::sensytwo::SensyTwoComponent(&sensy_uart);
       id(sensy_component) = sensy;
-      return sensy->get_all_sensors();
+      return std::vector<esphome::Component*>{sensy};
     components: [sensy_component]
+
+text_sensor:
+  - platform: custom
+    lambda: |-
+      return id(sensy_component)->get_text_sensors();
+    text_sensors:
+      - id: radar_firmware
+        name: "RADAR | Firmware"
+        entity_category: diagnostic
+      - id: radar_mac
+        name: "RADAR | MAC"
+        entity_category: diagnostic
+
+sensor:
+  - platform: custom
+    lambda: |-
+      return id(sensy_component)->get_target_sensors();
+    sensors:
+      - id: t1_x
+      - id: t1_y
+      - id: t1_angle
+      - id: t1_speed
+      - id: t1_distance_resolution
+      - id: t1_distance
+      - id: t2_x
+      - id: t2_y
+      - id: t2_angle
+      - id: t2_speed
+      - id: t2_distance_resolution
+      - id: t2_distance
+      - id: t3_x
+      - id: t3_y
+      - id: t3_angle
+      - id: t3_speed
+      - id: t3_distance_resolution
+      - id: t3_distance
 
 number:
   - platform: template
@@ -143,6 +208,18 @@ number:
     on_value:
       then:
         - lambda: 'id(sensy_component)->set_detection_range_threshold(id(detection_threshold).state);'
+
+button:
+  - platform: template
+    name: "RADAR | Restart Module"
+    on_press:
+      - lambda: 'id(sensy_component)->restart_module();'
+    entity_category: config
+  - platform: template
+    name: "RADAR | Reset Points"
+    on_press:
+      - lambda: 'id(sensy_component)->reset_points();'
+    entity_category: config
 
 sensor:
   - platform: template
