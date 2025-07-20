@@ -59,40 +59,106 @@ sensy_two:
   uart_id: sensy_uart
   t1_x:
     id: t1_x
+    name: "Target 1 X Coordinate"
+    unit_of_measurement: "cm"
+    accuracy_decimals: 2
+    icon: mdi:alpha-x-box-outline
   t1_y:
     id: t1_y
+    name: "Target 1 Y Coordinate"
+    unit_of_measurement: "cm"
+    accuracy_decimals: 2
+    icon: mdi:alpha-y-box-outline
   t1_angle:
     id: t1_angle
+    name: "Target 1 Angle"
+    unit_of_measurement: "°"
+    accuracy_decimals: 2
+    icon: mdi:format-text-rotation-angle-up
   t1_speed:
     id: t1_speed
+    name: "Target 1 Speed"
+    unit_of_measurement: "cm/s"
+    icon: mdi:speedometer
   t1_distance_resolution:
     id: t1_distance_resolution
+    name: "Target 1 Distance Resolution"
+    unit_of_measurement: "cm"
+    icon: mdi:diameter-outline
   t1_distance:
     id: t1_distance
+    name: "Target 1 Distance"
+    unit_of_measurement: "cm"
+    accuracy_decimals: 2
+    icon: mdi:map-marker-distance
   t2_x:
     id: t2_x
+    name: "Target 2 X Coordinate"
+    unit_of_measurement: "cm"
+    accuracy_decimals: 2
+    icon: mdi:alpha-x-box-outline
   t2_y:
     id: t2_y
+    name: "Target 2 Y Coordinate"
+    unit_of_measurement: "cm"
+    accuracy_decimals: 2
+    icon: mdi:alpha-y-box-outline
   t2_angle:
     id: t2_angle
+    name: "Target 2 Angle"
+    unit_of_measurement: "°"
+    accuracy_decimals: 2
+    icon: mdi:format-text-rotation-angle-up
   t2_speed:
     id: t2_speed
+    name: "Target 2 Speed"
+    unit_of_measurement: "cm/s"
+    icon: mdi:speedometer
   t2_distance_resolution:
     id: t2_distance_resolution
+    name: "Target 2 Distance Resolution"
+    unit_of_measurement: "cm"
+    icon: mdi:diameter-outline
   t2_distance:
     id: t2_distance
+    name: "Target 2 Distance"
+    unit_of_measurement: "cm"
+    accuracy_decimals: 2
+    icon: mdi:map-marker-distance
   t3_x:
     id: t3_x
+    name: "Target 3 X Coordinate"
+    unit_of_measurement: "cm"
+    accuracy_decimals: 2
+    icon: mdi:alpha-x-box-outline
   t3_y:
     id: t3_y
+    name: "Target 3 Y Coordinate"
+    unit_of_measurement: "cm"
+    accuracy_decimals: 2
+    icon: mdi:alpha-y-box-outline
   t3_angle:
     id: t3_angle
+    name: "Target 3 Angle"
+    unit_of_measurement: "°"
+    accuracy_decimals: 2
+    icon: mdi:format-text-rotation-angle-up
   t3_speed:
     id: t3_speed
+    name: "Target 3 Speed"
+    unit_of_measurement: "cm/s"
+    icon: mdi:speedometer
   t3_distance_resolution:
     id: t3_distance_resolution
+    name: "Target 3 Distance Resolution"
+    unit_of_measurement: "cm"
+    icon: mdi:diameter-outline
   t3_distance:
     id: t3_distance
+    name: "Target 3 Distance"
+    unit_of_measurement: "cm"
+    accuracy_decimals: 2
+    icon: mdi:map-marker-distance
   radar_firmware:
     id: radar_firmware
     name: "RADAR | Firmware"

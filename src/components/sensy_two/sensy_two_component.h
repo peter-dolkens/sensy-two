@@ -278,11 +278,14 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
           if (tlv_type_ == 0x02) {
             state_ = READING_PERSONS;
           } else {
-            state_ = SEARCHING_HEADER;
+            state_ = READING_POINTS;  // Skip other TLV data
           }
         }
         break;
       case READING_PERSONS:
+        if (item_index_ == 0) {
+          clear_targets_();
+        }
         if (available_ring_() >= sizeof(Person)) {
           Person p;
           read_ring_((uint8_t *)&p, sizeof(Person));
@@ -296,6 +299,19 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
         }
         break;
       case READING_POINTS:
+        if (available_ring_() > 0) {
+          uint8_t dump[64];
+          size_t todo = std::min<size_t>(tlv_len_ - bytes_read_, sizeof(dump));
+          todo = std::min(todo, available_ring_());
+          if (read_ring_(dump, todo)) {
+            bytes_read_ += todo;
+          }
+        }
+        if (bytes_read_ >= tlv_len_) {
+          frame_remaining_ -= tlv_len_;
+          state_ = (frame_remaining_ >= 8) ? READING_TLV_HEADER : SEARCHING_HEADER;
+        }
+        break;
       default:
         state_ = SEARCHING_HEADER;
         break;
@@ -355,6 +371,27 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
       t3_distance_resolution->publish_state(0);
       t3_distance->publish_state(distance);
     }
+  }
+
+  void clear_targets_() {
+    t1_x->publish_state(0);
+    t1_y->publish_state(0);
+    t1_angle->publish_state(0);
+    t1_speed->publish_state(0);
+    t1_distance_resolution->publish_state(0);
+    t1_distance->publish_state(0);
+    t2_x->publish_state(0);
+    t2_y->publish_state(0);
+    t2_angle->publish_state(0);
+    t2_speed->publish_state(0);
+    t2_distance_resolution->publish_state(0);
+    t2_distance->publish_state(0);
+    t3_x->publish_state(0);
+    t3_y->publish_state(0);
+    t3_angle->publish_state(0);
+    t3_speed->publish_state(0);
+    t3_distance_resolution->publish_state(0);
+    t3_distance->publish_state(0);
   }
 
   void parse_ascii_(const char *line) {
