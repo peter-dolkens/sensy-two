@@ -44,7 +44,7 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
     this->write_str("AT+SETTING\n");
     delay(100);
 #if defined(USE_ESP32_FRAMEWORK_ESP_IDF)
-    if (auto *idf = dynamic_cast<uart::IDFUARTComponent *>(this->parent_)) {
+    if (auto *idf = static_cast<uart::IDFUARTComponent *>(this->parent_)) {
       uart_num_ = idf->get_hw_serial_number();
       uart_queue_ = idf->get_uart_event_queue();
       xTaskCreatePinnedToCore(uart_task, "sensy_uart", 4096, this, 1, &task_handle_, 1);
@@ -113,9 +113,6 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
   char ascii_buffer_[64];
   size_t ascii_pos_ = 0;
 #if defined(USE_ESP32_FRAMEWORK_ESP_IDF)
-  static void uart_task(void *param);
-  void uart_task_loop_();
-  void write_ring_task_(const uint8_t *data, size_t len);
   uart_port_t uart_num_{};
   QueueHandle_t *uart_queue_{nullptr};
   TaskHandle_t task_handle_{nullptr};
@@ -191,7 +188,7 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
                 ascii_buffer_[ascii_pos_++] = c;
               }
             }
-            this->enable_loop_soon();
+            // Wake the main loop to process the received data
           }
         } else if (event.type == UART_FIFO_OVF || event.type == UART_BUFFER_FULL) {
           uart_flush_input(uart_num_);
@@ -233,8 +230,8 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
   bool read_ring_(uint8_t *dest, size_t len) {
     if (available_ring_() < len) return false;
     size_t first = std::min(len, RING_BUFFER_SIZE - tail_);
-    memcpy(dest, &ring_[tail_], first);
-    if (len > first) memcpy(dest + first, &ring_[0], len - first);
+    memcpy(dest, (const void *)&ring_[tail_], first);
+    if (len > first) memcpy(dest + first, (const void *)&ring_[0], len - first);
     tail_ = (tail_ + len) % RING_BUFFER_SIZE;
     return true;
   }
@@ -242,8 +239,8 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
   bool peek_ring_(uint8_t *dest, size_t len) {
     if (available_ring_() < len) return false;
     size_t first = std::min(len, RING_BUFFER_SIZE - tail_);
-    memcpy(dest, &ring_[tail_], first);
-    if (len > first) memcpy(dest + first, &ring_[0], len - first);
+    memcpy(dest, (const void *)&ring_[tail_], first);
+    if (len > first) memcpy(dest + first, (const void *)&ring_[0], len - first);
     return true;
   }
 
