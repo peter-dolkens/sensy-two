@@ -1,0 +1,19 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# C/C++ build artifacts
+*.o
+build/
+
+# ESPHome/PlatformIO artifacts
+.esphome/
+.pioenvs/
+.pio/
+
+# Binary output files
+*.bin
+*.factory.bin
+
+# MacOS metadata
+.DS_Store
