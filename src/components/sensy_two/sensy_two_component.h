@@ -45,7 +45,7 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
     delay(100);
 #if defined(USE_ESP32_FRAMEWORK_ESP_IDF)
     if (auto *idf = static_cast<uart::IDFUARTComponent *>(this->parent_)) {
-      uart_num_ = idf->get_hw_serial_number();
+      uart_num_ = static_cast<uart_port_t>(idf->get_hw_serial_number());
       uart_queue_ = idf->get_uart_event_queue();
       xTaskCreatePinnedToCore(uart_task, "sensy_uart", 4096, this, 1, &task_handle_, 1);
     }
