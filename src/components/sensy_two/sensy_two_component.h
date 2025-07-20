@@ -2,6 +2,7 @@
 #define SENSY_TWO_COMPONENT_H
 
 #include "esphome.h"
+#include "esphome/components/uart/uart.h"
 #include <cstring>
 #include <cmath>
 #include <vector>
@@ -9,10 +10,10 @@
 namespace esphome {
 namespace sensytwo {
 
-class SensyTwoComponent : public Component, public UARTDevice {
+class SensyTwoComponent : public Component, public uart::UARTDevice {
  public:
-  explicit SensyTwoComponent(UARTComponent *parent)
-      : UARTDevice(parent) {}
+  explicit SensyTwoComponent(uart::UARTComponent *parent)
+      : uart::UARTDevice(parent) {}
 
   void set_detection_range_threshold(float range_cm) {
     detection_range_threshold_ = range_cm;
