@@ -3,11 +3,8 @@
 
 #include "esphome.h"
 #include "esphome/components/uart/uart.h"
-#include "esphome/components/uart/uart_component_esp_idf.h"
-#include <driver/uart.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
-#include <freertos/queue.h>
 #include <cstring>
 #include <cmath>
 #include <vector>
@@ -33,11 +30,7 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
     this->radar_sensitivity(2);
     this->radar_seeking();
     this->radar_capture();
-    if (auto *idf = static_cast<uart::IDFUARTComponent *>(this->parent_)) {
-      uart_num_ = static_cast<uart_port_t>(idf->get_hw_serial_number());
-      uart_queue_ = idf->get_uart_event_queue();
-      xTaskCreatePinnedToCore(uart_task, "sensy_uart", 4096, this, 1, &task_handle_, 1);
-    }
+    xTaskCreatePinnedToCore(uart_task, "sensy_uart", 4096, this, 1, &task_handle_, 1);
   }
 
   void radar_start() { this->write_str("AT+START\n"); delay(100); }
@@ -125,8 +118,6 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
   volatile size_t tail_ = 0;
   static const size_t UART_BUFFER_SIZE = 128;
 
-  uart_port_t uart_num_{};
-  QueueHandle_t *uart_queue_{nullptr};
   TaskHandle_t task_handle_{nullptr};
 
   enum ParseState {
@@ -170,20 +161,18 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
   }
 
   void uart_task_loop() {
-    uart_event_t event;
     uint8_t temp[UART_BUFFER_SIZE];
-    size_t buffered_size;
     
     while (true) {
-      uart_get_buffered_data_len(uart_num_, &buffered_size);
-
-      if (buffered_size >= UART_BUFFER_SIZE) {
-        ESP_LOGI("SensyTwo", "Buffered data length: %d", buffered_size);
-        if (buffered_size > UART_BUFFER_SIZE) buffered_size = UART_BUFFER_SIZE;
-          int len = uart_read_bytes(uart_num_, temp, buffered_size, portMAX_DELAY);
-          if (len > 0) {
-            write_ring_task(temp, len);
-          }
+      size_t available = this->available();
+      if (available > 0) {
+        if (available > UART_BUFFER_SIZE) {
+          available = UART_BUFFER_SIZE;
+        }
+        size_t len = this->read_array(temp, available);
+        if (len > 0) {
+          write_ring_task(temp, len);
+        }
       }
 
       yield();  // Allow other tasks to run
