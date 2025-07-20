@@ -30,9 +30,12 @@ custom_component:
   - lambda: |-
       auto sensy = new esphome::sensytwo::SensyTwoComponent(&sensy_uart);
       id(sensy_component) = sensy;
-      return sensy->get_person_sensors();
+      return sensy->get_all_sensors();
     components: [sensy_component]
 ```
 
-This will create sensors for the six fields (x, y, z, vx, vy, vz) of each
-target.
+This will create sensors for each detected target including position (x and y),
+angle, speed and distance. The example configuration also exposes number
+entities to configure up to three detection zones and an optional exclusion
+zone. Template sensors calculate zone presence, movement and target counts
+matching the Sensy-One reference implementation.

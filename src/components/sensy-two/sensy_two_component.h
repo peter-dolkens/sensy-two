@@ -3,6 +3,7 @@
 
 #include "esphome.h"
 #include <cstring>
+#include <cmath>
 
 namespace esphome {
 namespace sensytwo {
@@ -11,6 +12,10 @@ class SensyTwoComponent : public Component, public UARTDevice {
  public:
   explicit SensyTwoComponent(UARTComponent *parent)
       : UARTDevice(parent) {}
+
+  void set_detection_range_threshold(float range_cm) {
+    detection_range_threshold_ = range_cm;
+  }
 
   void setup() override {
     this->write_str("AT+RESET\n");
@@ -36,32 +41,34 @@ class SensyTwoComponent : public Component, public UARTDevice {
     parse_ring_();
   }
 
-  std::vector<sensor::Sensor *> get_person_sensors() {
-    return {p1_x, p1_y, p1_z, p1_vx, p1_vy, p1_vz,
-            p2_x, p2_y, p2_z, p2_vx, p2_vy, p2_vz,
-            p3_x, p3_y, p3_z, p3_vx, p3_vy, p3_vz};
+  std::vector<sensor::Sensor *> get_target_sensors() {
+    return {t1_x, t1_y, t1_angle, t1_speed, t1_distance_resolution, t1_distance,
+            t2_x, t2_y, t2_angle, t2_speed, t2_distance_resolution, t2_distance,
+            t3_x, t3_y, t3_angle, t3_speed, t3_distance_resolution, t3_distance};
   }
 
-  sensor::Sensor *p1_x = new sensor::Sensor();
-  sensor::Sensor *p1_y = new sensor::Sensor();
-  sensor::Sensor *p1_z = new sensor::Sensor();
-  sensor::Sensor *p1_vx = new sensor::Sensor();
-  sensor::Sensor *p1_vy = new sensor::Sensor();
-  sensor::Sensor *p1_vz = new sensor::Sensor();
+  std::vector<sensor::Sensor *> get_all_sensors() { return get_target_sensors(); }
 
-  sensor::Sensor *p2_x = new sensor::Sensor();
-  sensor::Sensor *p2_y = new sensor::Sensor();
-  sensor::Sensor *p2_z = new sensor::Sensor();
-  sensor::Sensor *p2_vx = new sensor::Sensor();
-  sensor::Sensor *p2_vy = new sensor::Sensor();
-  sensor::Sensor *p2_vz = new sensor::Sensor();
+  sensor::Sensor *t1_x = new sensor::Sensor();
+  sensor::Sensor *t1_y = new sensor::Sensor();
+  sensor::Sensor *t1_angle = new sensor::Sensor();
+  sensor::Sensor *t1_speed = new sensor::Sensor();
+  sensor::Sensor *t1_distance_resolution = new sensor::Sensor();
+  sensor::Sensor *t1_distance = new sensor::Sensor();
 
-  sensor::Sensor *p3_x = new sensor::Sensor();
-  sensor::Sensor *p3_y = new sensor::Sensor();
-  sensor::Sensor *p3_z = new sensor::Sensor();
-  sensor::Sensor *p3_vx = new sensor::Sensor();
-  sensor::Sensor *p3_vy = new sensor::Sensor();
-  sensor::Sensor *p3_vz = new sensor::Sensor();
+  sensor::Sensor *t2_x = new sensor::Sensor();
+  sensor::Sensor *t2_y = new sensor::Sensor();
+  sensor::Sensor *t2_angle = new sensor::Sensor();
+  sensor::Sensor *t2_speed = new sensor::Sensor();
+  sensor::Sensor *t2_distance_resolution = new sensor::Sensor();
+  sensor::Sensor *t2_distance = new sensor::Sensor();
+
+  sensor::Sensor *t3_x = new sensor::Sensor();
+  sensor::Sensor *t3_y = new sensor::Sensor();
+  sensor::Sensor *t3_angle = new sensor::Sensor();
+  sensor::Sensor *t3_speed = new sensor::Sensor();
+  sensor::Sensor *t3_distance_resolution = new sensor::Sensor();
+  sensor::Sensor *t3_distance = new sensor::Sensor();
 
  protected:
   static const uint8_t HEADER[8];
@@ -87,6 +94,8 @@ class SensyTwoComponent : public Component, public UARTDevice {
   uint32_t tlv_len_ = 0;
   uint32_t bytes_read_ = 0;
   uint32_t item_index_ = 0;
+
+  float detection_range_threshold_ = 600.0f;
 
   struct Person {
     uint32_t id;
@@ -179,7 +188,7 @@ class SensyTwoComponent : public Component, public UARTDevice {
           Person p;
           read_ring_((uint8_t *)&p, sizeof(Person));
           bytes_read_ += sizeof(Person);
-          publish_person_(item_index_, p);
+          publish_target_(item_index_, p);
           item_index_++;
           if (bytes_read_ >= tlv_len_) {
             frame_remaining_ -= tlv_len_;
@@ -194,28 +203,58 @@ class SensyTwoComponent : public Component, public UARTDevice {
     }
   }
 
-  void publish_person_(size_t index, const Person &p) {
+  void publish_target_(size_t index, const Person &p) {
+    float distance = sqrtf(p.x * p.x + p.y * p.y + p.z * p.z);
+    float angle = (distance > 0.0f) ? atan2f(p.x, p.y) * 180.0f / M_PI : 0.0f;
+    float speed = sqrtf(p.vx * p.vx + p.vy * p.vy + p.vz * p.vz);
+
+    if (distance > detection_range_threshold_) {
+      if (index == 0) {
+        t1_x->publish_state(0);
+        t1_y->publish_state(0);
+        t1_angle->publish_state(0);
+        t1_speed->publish_state(0);
+        t1_distance_resolution->publish_state(0);
+        t1_distance->publish_state(0);
+      } else if (index == 1) {
+        t2_x->publish_state(0);
+        t2_y->publish_state(0);
+        t2_angle->publish_state(0);
+        t2_speed->publish_state(0);
+        t2_distance_resolution->publish_state(0);
+        t2_distance->publish_state(0);
+      } else if (index == 2) {
+        t3_x->publish_state(0);
+        t3_y->publish_state(0);
+        t3_angle->publish_state(0);
+        t3_speed->publish_state(0);
+        t3_distance_resolution->publish_state(0);
+        t3_distance->publish_state(0);
+      }
+      return;
+    }
+
     if (index == 0) {
-      p1_x->publish_state(p.x);
-      p1_y->publish_state(p.y);
-      p1_z->publish_state(p.z);
-      p1_vx->publish_state(p.vx);
-      p1_vy->publish_state(p.vy);
-      p1_vz->publish_state(p.vz);
+      t1_x->publish_state(p.x);
+      t1_y->publish_state(p.y);
+      t1_angle->publish_state(angle);
+      t1_speed->publish_state(speed);
+      t1_distance_resolution->publish_state(0);
+      t1_distance->publish_state(distance);
     } else if (index == 1) {
-      p2_x->publish_state(p.x);
-      p2_y->publish_state(p.y);
-      p2_z->publish_state(p.z);
-      p2_vx->publish_state(p.vx);
-      p2_vy->publish_state(p.vy);
-      p2_vz->publish_state(p.vz);
+      t2_x->publish_state(p.x);
+      t2_y->publish_state(p.y);
+      t2_angle->publish_state(angle);
+      t2_speed->publish_state(speed);
+      t2_distance_resolution->publish_state(0);
+      t2_distance->publish_state(distance);
     } else if (index == 2) {
-      p3_x->publish_state(p.x);
-      p3_y->publish_state(p.y);
-      p3_z->publish_state(p.z);
-      p3_vx->publish_state(p.vx);
-      p3_vy->publish_state(p.vy);
-      p3_vz->publish_state(p.vz);
+      t3_x->publish_state(p.x);
+      t3_y->publish_state(p.y);
+      t3_angle->publish_state(angle);
+      t3_speed->publish_state(speed);
+      t3_distance_resolution->publish_state(0);
+      t3_distance->publish_state(distance);
     }
   }
 };
