@@ -306,7 +306,7 @@ sensor:
          && !ex(id(t2_x).state,id(t2_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
       if(in_rect(id(t3_x).state,id(t3_y).state,id(zone1_x_begin).state,id(zone1_x_end).state,id(zone1_y_begin).state,id(zone1_y_end).state)
          && !ex(id(t3_x).state,id(t3_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
-      return det ? "Detected" : "Clear";
+      return det;
 
   - platform: template
     name: "Zone 2 Targets"
@@ -356,7 +356,7 @@ sensor:
          && !ex(id(t2_x).state,id(t2_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
       if(in_rect(id(t3_x).state,id(t3_y).state,id(zone2_x_begin).state,id(zone2_x_end).state,id(zone2_y_begin).state,id(zone2_y_end).state)
          && !ex(id(t3_x).state,id(t3_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
-      return det ? "Detected" : "Clear";
+      return det;
 
   - platform: template
     name: "Zone 3 Targets"
@@ -406,7 +406,7 @@ sensor:
          && !ex(id(t2_x).state,id(t2_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
       if(in_rect(id(t3_x).state,id(t3_y).state,id(zone3_x_begin).state,id(zone3_x_end).state,id(zone3_y_begin).state,id(zone3_y_end).state)
          && !ex(id(t3_x).state,id(t3_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
-      return det ? "Detected" : "Clear";
+      return det;
 
 
 
