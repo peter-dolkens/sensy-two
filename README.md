@@ -26,14 +26,14 @@ external_components:
       path: components
 
 uart:
-  id: sensy_uart
+  id: ms72sf1
   baud_rate: 115200
   tx_pin: 17
   rx_pin: 16
 
 sensy_two:
   id: sensy_component
-  uart_id: sensy_uart
+  uart_id: ms72sf1
   # Optional sensor entities
   radar_firmware:
     name: "RADAR | Firmware"

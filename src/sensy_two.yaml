@@ -39,7 +39,31 @@ esp32_improv:
 api:
 
 logger:
-  level: VERY_VERBOSE
+  level: ERROR
+  # VERY_VERBOSE
+#  logs:
+#    wifi: ERROR
+#    ms72sf1: VERY_VERBOSE
+#    ms72sf1_uart: VERY_VERBOSE
+#     esphome: DEBUG
+#     default: ERROR
+#    sensor: ERROR
+#    text_sensor: ERROR
+#     template: ERROR
+#     uart: ERROR
+#     mdns: ERROR
+#     esphome.core: ERROR
+#     esp32_ble: ERROR
+#     esp32_ble_server: ERROR
+#     esp32_improv: ERROR
+#    captive_portal: ERROR
+#    web_server: ERROR
+#    api: ERROR
+#    api.service: ERROR
+#    esp32.preferences: ERROR
+#    ota: ERROR
+#    number: ERROR
+#     ld2450: DEBUG
 
 web_server:
   port: 80
@@ -49,14 +73,22 @@ ota:
   platform: esphome
 
 uart:
-  id: sensy_uart
+  id: ms72sf1
   baud_rate: 115200
   tx_pin: 17
   rx_pin: 16
+  rx_buffer_size: 1024
+  # debug:
+  #   direction: BOTH
+  #   dummy_receiver: false
+  #   after:
+  #     delimiter: "\n"
+  #   sequence:
+  #     - lambda: UARTDebug::log_string(direction, bytes);
 
 sensy_two:
   id: sensy_component
-  uart_id: sensy_uart
+  uart_id: ms72sf1
   t1_x:
     id: t1_x
     name: "Target 1 X Coordinate"
@@ -69,6 +101,12 @@ sensy_two:
     unit_of_measurement: "cm"
     accuracy_decimals: 2
     icon: mdi:alpha-y-box-outline
+  t1_z:
+    id: t1_z
+    name: "Target 1 Z Coordinate"
+    unit_of_measurement: "cm"
+    accuracy_decimals: 2
+    icon: mdi:alpha-z-box-outline
   t1_angle:
     id: t1_angle
     name: "Target 1 Angle"
@@ -103,6 +141,12 @@ sensy_two:
     unit_of_measurement: "cm"
     accuracy_decimals: 2
     icon: mdi:alpha-y-box-outline
+  t2_z:
+    id: t2_z
+    name: "Target 2 Z Coordinate"
+    unit_of_measurement: "cm"
+    accuracy_decimals: 2
+    icon: mdi:alpha-z-box-outline
   t2_angle:
     id: t2_angle
     name: "Target 2 Angle"
@@ -137,6 +181,12 @@ sensy_two:
     unit_of_measurement: "cm"
     accuracy_decimals: 2
     icon: mdi:alpha-y-box-outline
+  t3_z:
+    id: t3_z
+    name: "Target 3 Z Coordinate"
+    unit_of_measurement: "cm"
+    accuracy_decimals: 2
+    icon: mdi:alpha-z-box-outline
   t3_angle:
     id: t3_angle
     name: "Target 3 Angle"

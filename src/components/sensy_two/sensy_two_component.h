@@ -25,6 +25,7 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
   }
 
   void setup() override {
+    this->radar_debug(3);
     this->radar_restart();
     this->radar_start();
     this->radar_report_interval(200);
@@ -40,6 +41,12 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
     }
   }
 
+  void radar_debug(int level) {
+    char cmd[32];
+    snprintf(cmd, sizeof(cmd), "AT+DEBUG=%d\n", level);
+    this->write_str(cmd);
+    delay(100);
+  }
   void radar_start() { this->write_str("AT+START\n"); delay(100); }
   void radar_report_interval(int value) {
     char cmd[32];
@@ -76,9 +83,9 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
   }
 
   std::vector<sensor::Sensor *> get_target_sensors() {
-    return {t1_x, t1_y, t1_angle, t1_speed, t1_distance_resolution, t1_distance,
-            t2_x, t2_y, t2_angle, t2_speed, t2_distance_resolution, t2_distance,
-            t3_x, t3_y, t3_angle, t3_speed, t3_distance_resolution, t3_distance};
+    return {t1_x, t1_y, t1_z, t1_angle, t1_speed, t1_distance_resolution, t1_distance,
+            t2_x, t2_y, t2_z, t2_angle, t2_speed, t2_distance_resolution, t2_distance,
+            t3_x, t3_y, t3_z, t3_angle, t3_speed, t3_distance_resolution, t3_distance};
   }
 
   std::vector<sensor::Sensor *> get_all_sensors() { return get_target_sensors(); }
@@ -95,6 +102,7 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
 
   sensor::Sensor *t1_x = new sensor::Sensor();
   sensor::Sensor *t1_y = new sensor::Sensor();
+  sensor::Sensor *t1_z = new sensor::Sensor();
   sensor::Sensor *t1_angle = new sensor::Sensor();
   sensor::Sensor *t1_speed = new sensor::Sensor();
   sensor::Sensor *t1_distance_resolution = new sensor::Sensor();
@@ -102,6 +110,7 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
 
   sensor::Sensor *t2_x = new sensor::Sensor();
   sensor::Sensor *t2_y = new sensor::Sensor();
+  sensor::Sensor *t2_z = new sensor::Sensor();
   sensor::Sensor *t2_angle = new sensor::Sensor();
   sensor::Sensor *t2_speed = new sensor::Sensor();
   sensor::Sensor *t2_distance_resolution = new sensor::Sensor();
@@ -109,6 +118,7 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
 
   sensor::Sensor *t3_x = new sensor::Sensor();
   sensor::Sensor *t3_y = new sensor::Sensor();
+  sensor::Sensor *t3_z = new sensor::Sensor();
   sensor::Sensor *t3_angle = new sensor::Sensor();
   sensor::Sensor *t3_speed = new sensor::Sensor();
   sensor::Sensor *t3_distance_resolution = new sensor::Sensor();
@@ -178,12 +188,20 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
       uart_get_buffered_data_len(uart_num_, &buffered_size);
 
       if (buffered_size >= UART_BUFFER_SIZE) {
-        ESP_LOGI("SensyTwo", "Buffered data length: %d", buffered_size);
         if (buffered_size > UART_BUFFER_SIZE) buffered_size = UART_BUFFER_SIZE;
-          int len = uart_read_bytes(uart_num_, temp, buffered_size, portMAX_DELAY);
-          if (len > 0) {
-            write_ring_task(temp, len);
-          }
+        int len = uart_read_bytes(uart_num_, temp, buffered_size, portMAX_DELAY);
+        if (len > 0) {
+          write_ring_task(temp, len);
+          // // Log the contents of temp in hex format
+          // char hexbuf[UART_BUFFER_SIZE * 3 + 1];
+          // size_t hexpos = 0;
+          // for (int i = 0; i < len; ++i) {
+          //   hexpos += snprintf(hexbuf + hexpos, sizeof(hexbuf) - hexpos, "%02X ", temp[i]);
+          //   if (hexpos >= sizeof(hexbuf) - 4) break;
+          // }
+          // hexbuf[hexpos] = '\0';
+          // ESP_LOGI("SensyTwo", "UART HEX: %s", hexbuf);
+        }
       }
 
       yield();  // Allow other tasks to run
@@ -321,6 +339,7 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
       if (index == 0) {
         t1_x->publish_state(0);
         t1_y->publish_state(0);
+        t1_z->publish_state(0);
         t1_angle->publish_state(0);
         t1_speed->publish_state(0);
         t1_distance_resolution->publish_state(0);
@@ -328,6 +347,7 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
       } else if (index == 1) {
         t2_x->publish_state(0);
         t2_y->publish_state(0);
+        t2_z->publish_state(0);
         t2_angle->publish_state(0);
         t2_speed->publish_state(0);
         t2_distance_resolution->publish_state(0);
@@ -335,6 +355,7 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
       } else if (index == 2) {
         t3_x->publish_state(0);
         t3_y->publish_state(0);
+        t3_z->publish_state(0);
         t3_angle->publish_state(0);
         t3_speed->publish_state(0);
         t3_distance_resolution->publish_state(0);
@@ -346,6 +367,7 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
     if (index == 0) {
       t1_x->publish_state(p.x);
       t1_y->publish_state(p.y);
+      t1_z->publish_state(p.z);
       t1_angle->publish_state(angle);
       t1_speed->publish_state(speed);
       t1_distance_resolution->publish_state(0);
@@ -353,6 +375,7 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
     } else if (index == 1) {
       t2_x->publish_state(p.x);
       t2_y->publish_state(p.y);
+      t2_z->publish_state(p.z);
       t2_angle->publish_state(angle);
       t2_speed->publish_state(speed);
       t2_distance_resolution->publish_state(0);
@@ -360,6 +383,7 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
     } else if (index == 2) {
       t3_x->publish_state(p.x);
       t3_y->publish_state(p.y);
+      t3_z->publish_state(p.z);
       t3_angle->publish_state(angle);
       t3_speed->publish_state(speed);
       t3_distance_resolution->publish_state(0);
@@ -371,18 +395,21 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
     return;
     t1_x->publish_state(0);
     t1_y->publish_state(0);
+    t1_z->publish_state(0);
     t1_angle->publish_state(0);
     t1_speed->publish_state(0);
     t1_distance_resolution->publish_state(0);
     t1_distance->publish_state(0);
     t2_x->publish_state(0);
     t2_y->publish_state(0);
+    t2_z->publish_state(0);
     t2_angle->publish_state(0);
     t2_speed->publish_state(0);
     t2_distance_resolution->publish_state(0);
     t2_distance->publish_state(0);
     t3_x->publish_state(0);
     t3_y->publish_state(0);
+    t3_z->publish_state(0);
     t3_angle->publish_state(0);
     t3_speed->publish_state(0);
     t3_distance_resolution->publish_state(0);
