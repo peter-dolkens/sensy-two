@@ -317,18 +317,18 @@ button:
   - platform: template
     name: "RADAR | Restart Module"
     on_press:
-      - lambda: 'id(sensy_component)->restart_module();'
+      - lambda: 'id(sensy_component)->radar_restart();'
     entity_category: config
   - platform: template
-    name: "RADAR | Reset Points"
+    name: "RADAR | Capture Points"
     on_press:
-      - lambda: 'id(sensy_component)->reset_points();'
+      - lambda: 'id(sensy_component)->radar_capture();'
     entity_category: config
 
 sensor:
   - platform: template
     name: "Zone 1 Targets"
-    update_interval: 500ms
+    update_interval: 50000ms
     lambda: |-
       auto in_rect = [](float x,float y,float x0,float x1,float y0,float y1){
         float x_min = std::min(x0,x1);
@@ -353,7 +353,7 @@ sensor:
 
   - platform: template
     name: "Zone 1 Presence"
-    update_interval: 500ms
+    update_interval: 50000ms
     lambda: |-
       auto in_rect = [](float x,float y,float x0,float x1,float y0,float y1){
         float x_min = std::min(x0,x1);
@@ -378,7 +378,7 @@ sensor:
 
   - platform: template
     name: "Zone 2 Targets"
-    update_interval: 500ms
+    update_interval: 50000ms
     lambda: |-
       auto in_rect = [](float x,float y,float x0,float x1,float y0,float y1){
         float x_min = std::min(x0,x1);
@@ -403,7 +403,7 @@ sensor:
 
   - platform: template
     name: "Zone 2 Presence"
-    update_interval: 500ms
+    update_interval: 50000ms
     lambda: |-
       auto in_rect = [](float x,float y,float x0,float x1,float y0,float y1){
         float x_min = std::min(x0,x1);
@@ -428,7 +428,7 @@ sensor:
 
   - platform: template
     name: "Zone 3 Targets"
-    update_interval: 500ms
+    update_interval: 50000ms
     lambda: |-
       auto in_rect = [](float x,float y,float x0,float x1,float y0,float y1){
         float x_min = std::min(x0,x1);
@@ -453,7 +453,7 @@ sensor:
 
   - platform: template
     name: "Zone 3 Presence"
-    update_interval: 500ms
+    update_interval: 50000ms
     lambda: |-
       auto in_rect = [](float x,float y,float x0,float x1,float y0,float y1){
         float x_min = std::min(x0,x1);
