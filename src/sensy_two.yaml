@@ -1,7 +1,15 @@
 esphome:
   name: sensy_two
   includes:
-    - components/sensy-two/sensy_two_component.h
+    - components/sensy_two/sensy_two_component.h
+
+esp32:
+  board: esp32dev
+
+external_components:
+  - source:
+      type: local
+      path: components
 
 wifi:
   ap:
@@ -38,48 +46,53 @@ uart:
   tx_pin: 17
   rx_pin: 16
 
-custom_component:
-  - lambda: |-
-      auto sensy = new esphome::sensytwo::SensyTwoComponent(&sensy_uart);
-      id(sensy_component) = sensy;
-      return std::vector<esphome::Component*>{sensy};
-    components: [sensy_component]
-
-text_sensor:
-  - platform: custom
-    lambda: |-
-      return id(sensy_component)->get_text_sensors();
-    text_sensors:
-      - id: radar_firmware
-        name: "RADAR | Firmware"
-        entity_category: diagnostic
-      - id: radar_mac
-        name: "RADAR | MAC"
-        entity_category: diagnostic
-
-sensor:
-  - platform: custom
-    lambda: |-
-      return id(sensy_component)->get_target_sensors();
-    sensors:
-      - id: t1_x
-      - id: t1_y
-      - id: t1_angle
-      - id: t1_speed
-      - id: t1_distance_resolution
-      - id: t1_distance
-      - id: t2_x
-      - id: t2_y
-      - id: t2_angle
-      - id: t2_speed
-      - id: t2_distance_resolution
-      - id: t2_distance
-      - id: t3_x
-      - id: t3_y
-      - id: t3_angle
-      - id: t3_speed
-      - id: t3_distance_resolution
-      - id: t3_distance
+sensy_two:
+  id: sensy_component
+  uart_id: sensy_uart
+  t1_x:
+    id: t1_x
+  t1_y:
+    id: t1_y
+  t1_angle:
+    id: t1_angle
+  t1_speed:
+    id: t1_speed
+  t1_distance_resolution:
+    id: t1_distance_resolution
+  t1_distance:
+    id: t1_distance
+  t2_x:
+    id: t2_x
+  t2_y:
+    id: t2_y
+  t2_angle:
+    id: t2_angle
+  t2_speed:
+    id: t2_speed
+  t2_distance_resolution:
+    id: t2_distance_resolution
+  t2_distance:
+    id: t2_distance
+  t3_x:
+    id: t3_x
+  t3_y:
+    id: t3_y
+  t3_angle:
+    id: t3_angle
+  t3_speed:
+    id: t3_speed
+  t3_distance_resolution:
+    id: t3_distance_resolution
+  t3_distance:
+    id: t3_distance
+  radar_firmware:
+    id: radar_firmware
+    name: "RADAR | Firmware"
+    entity_category: diagnostic
+  radar_mac:
+    id: radar_mac
+    name: "RADAR | MAC"
+    entity_category: diagnostic
 
 number:
   - platform: template
