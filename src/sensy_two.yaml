@@ -1,5 +1,11 @@
 esphome:
-  name: sensy_two
+  name: sensy-two
+  friendly_name: Sensy Two 
+  name_add_mac_suffix: True
+  project: 
+    name: Sensy-Two.S2 mmWave Sensor
+    version: v0.0.1
+    
   includes:
     - components/sensy_two/sensy_two_component.h
 
