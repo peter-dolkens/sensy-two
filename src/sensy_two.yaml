@@ -107,6 +107,7 @@ number:
     min_value: -600
     max_value: 600
     step: 1
+    optimistic: true
     restore_value: true
   - platform: template
     id: zone1_x_end
@@ -114,6 +115,7 @@ number:
     min_value: -600
     max_value: 600
     step: 1
+    optimistic: true
     restore_value: true
   - platform: template
     id: zone1_y_begin
@@ -121,6 +123,7 @@ number:
     min_value: 0
     max_value: 600
     step: 1
+    optimistic: true
     restore_value: true
   - platform: template
     id: zone1_y_end
@@ -128,6 +131,7 @@ number:
     min_value: 0
     max_value: 600
     step: 1
+    optimistic: true
     restore_value: true
 
   - platform: template
@@ -136,6 +140,7 @@ number:
     min_value: -600
     max_value: 600
     step: 1
+    optimistic: true
     restore_value: true
   - platform: template
     id: zone2_x_end
@@ -143,6 +148,7 @@ number:
     min_value: -600
     max_value: 600
     step: 1
+    optimistic: true
     restore_value: true
   - platform: template
     id: zone2_y_begin
@@ -150,6 +156,7 @@ number:
     min_value: 0
     max_value: 600
     step: 1
+    optimistic: true
     restore_value: true
   - platform: template
     id: zone2_y_end
@@ -157,6 +164,7 @@ number:
     min_value: 0
     max_value: 600
     step: 1
+    optimistic: true
     restore_value: true
 
   - platform: template
@@ -165,6 +173,7 @@ number:
     min_value: -600
     max_value: 600
     step: 1
+    optimistic: true
     restore_value: true
   - platform: template
     id: zone3_x_end
@@ -172,6 +181,7 @@ number:
     min_value: -600
     max_value: 600
     step: 1
+    optimistic: true
     restore_value: true
   - platform: template
     id: zone3_y_begin
@@ -179,6 +189,7 @@ number:
     min_value: 0
     max_value: 600
     step: 1
+    optimistic: true
     restore_value: true
   - platform: template
     id: zone3_y_end
@@ -186,6 +197,7 @@ number:
     min_value: 0
     max_value: 600
     step: 1
+    optimistic: true
     restore_value: true
 
   - platform: template
@@ -194,6 +206,7 @@ number:
     min_value: -600
     max_value: 600
     step: 1
+    optimistic: true
     restore_value: true
   - platform: template
     id: exclusion_x_end
@@ -201,6 +214,7 @@ number:
     min_value: -600
     max_value: 600
     step: 1
+    optimistic: true
     restore_value: true
   - platform: template
     id: exclusion_y_begin
@@ -208,6 +222,7 @@ number:
     min_value: 0
     max_value: 600
     step: 1
+    optimistic: true
     restore_value: true
   - platform: template
     id: exclusion_y_end
@@ -215,6 +230,7 @@ number:
     min_value: 0
     max_value: 600
     step: 1
+    optimistic: true
     restore_value: true
 
   - platform: template
@@ -223,6 +239,7 @@ number:
     min_value: 0
     max_value: 600
     step: 1
+    optimistic: true
     restore_value: true
     on_value:
       then:
