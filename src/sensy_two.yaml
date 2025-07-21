@@ -638,6 +638,19 @@ number:
       then:
         - lambda: 'id(sensy_component)->set_detection_range_threshold(id(detection_threshold).state);'
 
+  - platform: template
+    id: publish_interval
+    name: "Publish Interval"
+    min_value: 100
+    max_value: 1000
+    step: 100
+    unit_of_measurement: "ms"
+    optimistic: true
+    restore_value: true
+    on_value:
+      then:
+        - lambda: 'id(sensy_component)->set_publish_interval_ms(id(publish_interval).state);'
+
 button:
   - platform: template
     name: "RADAR | Restart Module"

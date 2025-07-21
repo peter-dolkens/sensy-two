@@ -27,6 +27,10 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
     detection_range_threshold_ = range_cm;
   }
 
+  void set_publish_interval_ms(uint32_t interval_ms) {
+    publish_interval_ms_ = interval_ms;
+  }
+
   void setup() override {
     // this->radar_debug(3);
     this->radar_restart();
@@ -237,6 +241,15 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
   uint32_t item_index_ = 0;
 
   float detection_range_threshold_ = 600.0f;
+  uint32_t publish_interval_ms_ = 1000;
+
+  struct TargetState {
+    std::array<float, FIELDS> values{};
+  };
+
+  std::array<TargetState, MAX_TARGETS> current_state_{};
+  std::array<TargetState, MAX_TARGETS> last_published_{};
+  std::array<uint32_t, MAX_TARGETS> last_published_time_{};
 
   struct Person {
     uint32_t id;
@@ -338,6 +351,23 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
     return true;
   }
 
+  void maybe_publish(size_t index) {
+    uint32_t now = millis();
+    if (now - last_published_time_[index] < publish_interval_ms_) return;
+    if (current_state_[index].values != last_published_[index].values) {
+      last_published_time_[index] = now;
+      last_published_[index] = current_state_[index];
+      auto &vals = current_state_[index].values;
+      x_sensors_[index]->publish_state(vals[0]);
+      y_sensors_[index]->publish_state(vals[1]);
+      z_sensors_[index]->publish_state(vals[2]);
+      angle_sensors_[index]->publish_state(vals[3]);
+      speed_sensors_[index]->publish_state(vals[4]);
+      distance_resolution_sensors_[index]->publish_state(vals[5]);
+      distance_sensors_[index]->publish_state(vals[6]);
+    }
+  }
+
   void parse_ring() {
     switch (state_) {
       case SEARCHING_HEADER: {
@@ -419,32 +449,21 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
     float angle = (distance > 0.0f) ? atan2f(p.x, p.y) * 180.0f / M_PI : 0.0f;
     float speed = sqrtf(p.vx * p.vx + p.vy * p.vy + p.vz * p.vz);
 
-    auto publish = [&](float x, float y, float z, float ang, float spd, float dist, uint32_t resolution) {
-      x_sensors_[index]->publish_state(x);
-      y_sensors_[index]->publish_state(y);
-      z_sensors_[index]->publish_state(z);
-      angle_sensors_[index]->publish_state(ang);
-      speed_sensors_[index]->publish_state(spd);
-      distance_resolution_sensors_[index]->publish_state(resolution);
-      distance_sensors_[index]->publish_state(dist);
-    };
-
+    TargetState state;
     if (distance > detection_range_threshold_) {
-      publish(0, 0, 0, 0, 0, 0, 0);
+      state.values = {0, 0, 0, 0, 0, 0, 0, 0};
     } else {
-      publish(p.x * 100, p.y * 100, p.z * 100, angle, speed * 100, distance * 100, p.q);
+      state.values = {p.x * 100, p.y * 100, p.z * 100, angle, speed * 100, 0, distance * 100, resolution * 1.0};
     }
+    current_state_[index] = state;
+
+    maybe_publish(index);
   }
 
   void clear_targets() {
     for (size_t i = 0; i < MAX_TARGETS; ++i) {
-      x_sensors_[i]->publish_state(0);
-      y_sensors_[i]->publish_state(0);
-      z_sensors_[i]->publish_state(0);
-      angle_sensors_[i]->publish_state(0);
-      speed_sensors_[i]->publish_state(0);
-      distance_resolution_sensors_[i]->publish_state(0);
-      distance_sensors_[i]->publish_state(0);
+      current_state_[i].values = {0, 0, 0, 0, 0, 0, 0, 0};
+      maybe_publish(i);
     }
   }
 
@@ -473,13 +492,9 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
   }
 
   void publish_empty(size_t index) {
-    x_sensors_[index]->publish_state(0);
-    y_sensors_[index]->publish_state(0);
-    z_sensors_[index]->publish_state(0);
-    angle_sensors_[index]->publish_state(0);
-    speed_sensors_[index]->publish_state(0);
-    distance_resolution_sensors_[index]->publish_state(0);
-    distance_sensors_[index]->publish_state(0);
+    if (index >= MAX_TARGETS) return;
+    current_state_[index].values = {0, 0, 0, 0, 0, 0, 0, 0};
+    maybe_publish(index);
   }
 
   void assign_persons(const std::vector<Person> &persons) {
