@@ -19,7 +19,7 @@ namespace sensytwo {
 class SensyTwoComponent : public Component, public uart::UARTDevice {
  public:
   static const size_t MAX_TARGETS = 10;
-  static const size_t FIELDS = 7;
+  static const size_t FIELDS = 8;
   explicit SensyTwoComponent(uart::UARTComponent *parent)
       : uart::UARTDevice(parent) {}
 
@@ -90,6 +90,9 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
     parse_ring();
     yield();  // Allow other tasks to run
     delay(10);  // Allow some time for UART processing
+    for (size_t i = 0; i < MAX_TARGETS; ++i) {
+      maybe_publish(i);
+    }
   }
 
   std::vector<sensor::Sensor *> get_target_sensors() {
@@ -453,17 +456,14 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
     if (distance > detection_range_threshold_) {
       state.values = {0, 0, 0, 0, 0, 0, 0, 0};
     } else {
-      state.values = {p.x * 100, p.y * 100, p.z * 100, angle, speed * 100, 0, distance * 100, resolution * 1.0};
+      state.values = {p.x * 100, p.y * 100, p.z * 100, angle, speed * 100, 0, distance * 100, p.q * 1.0};
     }
     current_state_[index] = state;
-
-    maybe_publish(index);
   }
 
   void clear_targets() {
     for (size_t i = 0; i < MAX_TARGETS; ++i) {
       current_state_[i].values = {0, 0, 0, 0, 0, 0, 0, 0};
-      maybe_publish(i);
     }
   }
 
@@ -494,7 +494,6 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
   void publish_empty(size_t index) {
     if (index >= MAX_TARGETS) return;
     current_state_[index].values = {0, 0, 0, 0, 0, 0, 0, 0};
-    maybe_publish(index);
   }
 
   void assign_persons(const std::vector<Person> &persons) {
