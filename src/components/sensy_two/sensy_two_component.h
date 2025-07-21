@@ -23,10 +23,6 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
   explicit SensyTwoComponent(uart::UARTComponent *parent)
       : uart::UARTDevice(parent) {}
 
-  void set_detection_range_threshold(float range_cm) {
-    detection_range_threshold_ = range_cm;
-  }
-
   void set_publish_interval_ms(uint32_t interval_ms) {
     publish_interval_ms_ = interval_ms;
   }
@@ -35,33 +31,7 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
   void set_rotation_y_deg(float deg) { rotation_y_ = deg * M_PI / 180.0f; }
   void set_rotation_z_deg(float deg) { rotation_z_ = deg * M_PI / 180.0f; }
 
-  void set_sensitivity(int value) {
-    sensitivity_ = value;
-    this->radar_sensitivity(value);
-  }
-
-  void set_report_interval_ms(int value) {
-    report_interval_ms_ = value;
-    this->radar_report_interval(value);
-  }
-
-  void set_monitor_interval_s(int value) {
-    monitor_interval_s_ = value;
-    this->radar_monitor_interval(value);
-  }
-
-  void set_heartbeat_interval_s(int value) {
-    heartbeat_interval_s_ = value;
-    this->radar_heartbeat_timeout(value);
-  }
-
-  void set_range_cm(int value) {
-    range_cm_ = value;
-    this->radar_range(value);
-  }
-
   void setup() override {
-    // this->radar_debug(3);
     this->radar_restart();
     this->radar_start();
     this->radar_report_interval(report_interval_ms_);
@@ -71,14 +41,12 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
     this->radar_sensitivity(sensitivity_);
     this->radar_seeking();
     this->radar_capture();
+
     if (auto *idf = static_cast<uart::IDFUARTComponent *>(this->parent_)) {
       uart_num_ = static_cast<uart_port_t>(idf->get_hw_serial_number());
       uart_queue_ = idf->get_uart_event_queue();
       xTaskCreatePinnedToCore(uart_task, "sensy_uart", 4096, this, 1, &task_handle_, 1);
     }
-
-    this->read_firmware();
-    this->read_mac_address();
   }
 
   void radar_debug(int level) {
@@ -144,18 +112,6 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
       sensors.push_back(distance_sensors_[i]);
     }
     return sensors;
-  }
-
-  std::vector<sensor::Sensor *> get_all_sensors() { return get_target_sensors(); }
-
-  std::vector<text_sensor::TextSensor *> get_text_sensors() {
-    return {radar_firmware, radar_mac};
-  }
-
-  void read_firmware() { this->write_str("AT+FIRMWARE\n"); delay(100); }
-
-  void read_mac_address() {
-    radar_mac->publish_state(esphome::get_mac_address());
   }
 
   sensor::Sensor *t1_x = new sensor::Sensor();
@@ -279,7 +235,6 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
   uint32_t bytes_read_ = 0;
   uint32_t item_index_ = 0;
 
-  float detection_range_threshold_ = 600.0f;
   uint32_t publish_interval_ms_ = 1000;
   float rotation_x_ = 0.0f;
   float rotation_y_ = 0.0f;
@@ -454,13 +409,9 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
       float angle = (distance > 0.0f) ? atan2f(x, y) * 180.0f / M_PI : 0.0f;
       float speed = sqrtf(vx * vx + vy * vy + vz * vz);
       auto r2 = [](float v) { return roundf(v * 100.0f) / 100.0f; };
-      if (distance > detection_range_threshold_) {
-        state.values = {0, 0, 0, 0, 0, 0, 0, 0};
-      } else {
-        state.values = {r2(x * 100), r2(y * 100), r2(z * 100), r2(angle),
-                        r2(speed * 100), 0, r2(distance * 100),
-                        raw_targets_[index].q * 1.0f};
-      }
+      state.values = {r2(x * 100), r2(y * 100), r2(z * 100), r2(angle),
+                      r2(speed * 100), 0, r2(distance * 100),
+                      raw_targets_[index].q * 1.0f};
     } else {
       state.values = {0, 0, 0, 0, 0, 0, 0, 0};
     }
@@ -616,7 +567,6 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
       float z = raw_targets_[i].z;
       apply_rotation(x, y, z);
       float distance = sqrtf(x * x + y * y + z * z);
-      if (distance > detection_range_threshold_) continue;
       float x_cm = x * 100.0f;
       float y_cm = y * 100.0f;
       if (in_rect(x_cm, y_cm, x0, x1, y0, y1) &&

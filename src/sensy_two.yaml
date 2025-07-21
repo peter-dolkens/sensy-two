@@ -495,45 +495,41 @@ sensy_two:
     unit_of_measurement: "cm"
     accuracy_decimals: 2
     icon: mdi:map-marker-distance
-  radar_firmware:
-    id: radar_firmware
-    name: "RADAR | Firmware"
-    entity_category: diagnostic
-  radar_mac:
-    id: radar_mac
-    name: "RADAR | MAC"
-    entity_category: diagnostic
 
 number:
   - platform: template
     id: zone1_x_begin
     name: "Zone 1 X Begin"
-    min_value: -600
-    max_value: 600
+    min_value: -1000
+    initial_value: 0
+    max_value: 1000
     step: 1
     optimistic: true
     restore_value: true
   - platform: template
     id: zone1_x_end
     name: "Zone 1 X End"
-    min_value: -600
-    max_value: 600
+    min_value: -1000
+    initial_value: 0
+    max_value: 1000
     step: 1
     optimistic: true
     restore_value: true
   - platform: template
     id: zone1_y_begin
     name: "Zone 1 Y Begin"
-    min_value: 0
-    max_value: 600
+    min_value: -1000
+    initial_value: 0
+    max_value: 1000
     step: 1
     optimistic: true
     restore_value: true
   - platform: template
     id: zone1_y_end
     name: "Zone 1 Y End"
-    min_value: 0
-    max_value: 600
+    min_value: -1000
+    initial_value: 0
+    max_value: 1000
     step: 1
     optimistic: true
     restore_value: true
@@ -541,32 +537,36 @@ number:
   - platform: template
     id: zone2_x_begin
     name: "Zone 2 X Begin"
-    min_value: -600
-    max_value: 600
+    min_value: -1000
+    initial_value: 0
+    max_value: 1000
     step: 1
     optimistic: true
     restore_value: true
   - platform: template
     id: zone2_x_end
     name: "Zone 2 X End"
-    min_value: -600
-    max_value: 600
+    min_value: -1000
+    initial_value: 0
+    max_value: 1000
     step: 1
     optimistic: true
     restore_value: true
   - platform: template
     id: zone2_y_begin
     name: "Zone 2 Y Begin"
-    min_value: 0
-    max_value: 600
+    min_value: -1000
+    initial_value: 0
+    max_value: 1000
     step: 1
     optimistic: true
     restore_value: true
   - platform: template
     id: zone2_y_end
     name: "Zone 2 Y End"
-    min_value: 0
-    max_value: 600
+    min_value: -1000
+    initial_value: 0
+    max_value: 1000
     step: 1
     optimistic: true
     restore_value: true
@@ -574,32 +574,36 @@ number:
   - platform: template
     id: zone3_x_begin
     name: "Zone 3 X Begin"
-    min_value: -600
-    max_value: 600
+    min_value: -1000
+    initial_value: 0
+    max_value: 1000
     step: 1
     optimistic: true
     restore_value: true
   - platform: template
     id: zone3_x_end
     name: "Zone 3 X End"
-    min_value: -600
-    max_value: 600
+    min_value: -1000
+    initial_value: 0
+    max_value: 1000
     step: 1
     optimistic: true
     restore_value: true
   - platform: template
     id: zone3_y_begin
     name: "Zone 3 Y Begin"
-    min_value: 0
-    max_value: 600
+    min_value: -1000
+    initial_value: 0
+    max_value: 1000
     step: 1
     optimistic: true
     restore_value: true
   - platform: template
     id: zone3_y_end
     name: "Zone 3 Y End"
-    min_value: 0
-    max_value: 600
+    min_value: -1000
+    initial_value: 0
+    max_value: 1000
     step: 1
     optimistic: true
     restore_value: true
@@ -607,50 +611,39 @@ number:
   - platform: template
     id: exclusion_x_begin
     name: "Exclusion X Begin"
-    min_value: -600
-    max_value: 600
+    min_value: -1000
+    initial_value: 0
+    max_value: 1000
     step: 1
     optimistic: true
     restore_value: true
   - platform: template
     id: exclusion_x_end
     name: "Exclusion X End"
-    min_value: -600
-    max_value: 600
+    min_value: -1000
+    initial_value: 0
+    max_value: 1000
     step: 1
     optimistic: true
     restore_value: true
   - platform: template
     id: exclusion_y_begin
     name: "Exclusion Y Begin"
-    min_value: 0
-    max_value: 600
+    min_value: -1000
+    initial_value: 0
+    max_value: 1000
     step: 1
     optimistic: true
     restore_value: true
   - platform: template
     id: exclusion_y_end
     name: "Exclusion Y End"
-    min_value: 0
-    max_value: 600
+    min_value: -1000
+    initial_value: 0
+    max_value: 1000
     step: 1
     optimistic: true
     restore_value: true
-
-  - platform: template
-    id: detection_threshold
-    name: "Detection Range"
-    min_value: 0
-    max_value: 600
-    step: 1
-    optimistic: true
-    restore_value: true
-    entity_category: diagnostic
-    on_value:
-      then:
-        - lambda: |-
-            id(sensy_component)->set_detection_range_threshold(
-              id(detection_threshold).state);
 
   - platform: template
     id: radar_sensitivity
@@ -660,80 +653,74 @@ number:
     step: 1
     optimistic: true
     restore_value: true
-    entity_category: diagnostic
+    entity_category: config
     on_value:
       then:
-        - lambda: |-
-            id(sensy_component)->set_sensitivity(
-              (int)id(radar_sensitivity).state);
+        - lambda: 'id(sensy_component)->radar_sensitivity((int)id(radar_sensitivity).state);'
 
   - platform: template
     id: radar_report_interval
-    name: "RADAR | Report Interval"
+    name: "Report Interval"
     min_value: 100
     max_value: 10000
     step: 100
+    mode: box
     unit_of_measurement: "ms"
     optimistic: true
     restore_value: true
     initial_value: 200
-    entity_category: diagnostic
+    entity_category: config
     on_value:
       then:
-        - lambda: |-
-            id(sensy_component)->set_report_interval_ms(
-              (int)id(radar_report_interval).state);
+        - lambda: 'id(sensy_component)->radar_report_interval((int)id(radar_report_interval).state);'
 
   - platform: template
     id: radar_monitor_interval
-    name: "RADAR | Monitor Interval"
+    name: "Monitor Interval"
     min_value: 1
     max_value: 99
     step: 1
+    mode: box
     unit_of_measurement: "s"
     optimistic: true
     restore_value: true
     initial_value: 1
-    entity_category: diagnostic
+    entity_category: config
     on_value:
       then:
-        - lambda: |-
-            id(sensy_component)->set_monitor_interval_s(
-              (int)id(radar_monitor_interval).state);
+        - lambda: 'id(sensy_component)->radar_monitor_interval((int)id(radar_monitor_interval).state);'
 
   - platform: template
     id: radar_heartbeat_interval
-    name: "RADAR | Heartbeat Interval"
+    name: "Heartbeat Interval"
     min_value: 10
     max_value: 99
     step: 1
+    mode: box
     unit_of_measurement: "s"
     optimistic: true
     restore_value: true
     initial_value: 10
-    entity_category: diagnostic
+    entity_category: config
     on_value:
       then:
-        - lambda: |-
-            id(sensy_component)->set_heartbeat_interval_s(
-              (int)id(radar_heartbeat_interval).state);
+        - lambda: 'id(sensy_component)->radar_heartbeat_timeout((int)id(radar_heartbeat_interval).state);'
 
   - platform: template
     id: radar_range
-    name: "RADAR | Range"
+    name: "Detection Range"
     min_value: 10
     max_value: 1000
     step: 10
+    mode: box
     unit_of_measurement: "cm"
     optimistic: true
     restore_value: true
     initial_value: 600
-    entity_category: diagnostic
+    entity_category: config
     on_value:
       then:
-        - lambda: |-
-            id(sensy_component)->set_range_cm(
-              (int)id(radar_range).state);
+        - lambda: 'id(sensy_component)->radar_range((int)id(radar_range).state);'
 
   - platform: template
     id: publish_interval
@@ -741,14 +728,14 @@ number:
     min_value: 100
     max_value: 1000
     step: 100
+    mode: box
     unit_of_measurement: "ms"
     optimistic: true
     restore_value: true
+    entity_category: config
     on_value:
       then:
-        - lambda: |-
-            id(sensy_component)->set_publish_interval_ms(
-              id(publish_interval).state);
+        - lambda: 'id(sensy_component)->set_publish_interval_ms(id(publish_interval).state);'
 
   - platform: template
     id: rotation_x
@@ -760,9 +747,7 @@ number:
     restore_value: true
     on_value:
       then:
-        - lambda: |-
-            id(sensy_component)->set_rotation_x_deg(
-              id(rotation_x).state);
+        - lambda: 'id(sensy_component)->set_rotation_x_deg(id(rotation_x).state);'
 
   - platform: template
     id: rotation_y
@@ -774,9 +759,7 @@ number:
     restore_value: true
     on_value:
       then:
-        - lambda: |-
-            id(sensy_component)->set_rotation_y_deg(
-              id(rotation_y).state);
+        - lambda: 'id(sensy_component)->set_rotation_y_deg(id(rotation_y).state);'
 
   - platform: template
     id: rotation_z
@@ -788,21 +771,19 @@ number:
     restore_value: true
     on_value:
       then:
-        - lambda: |-
-            id(sensy_component)->set_rotation_z_deg(
-              id(rotation_z).state);
+        - lambda: 'id(sensy_component)->set_rotation_z_deg(id(rotation_z).state);'
 
 button:
   - platform: template
     name: "RADAR | Restart Module"
     on_press:
       - lambda: 'id(sensy_component)->radar_restart();'
-    entity_category: config
+    entity_category: diagnostic
   - platform: template
     name: "RADAR | Capture Points"
     on_press:
       - lambda: 'id(sensy_component)->radar_capture();'
-    entity_category: config
+    entity_category: diagnostic
 
 sensor:
   - platform: template
