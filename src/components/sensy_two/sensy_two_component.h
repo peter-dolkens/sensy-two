@@ -35,6 +35,11 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
   void set_rotation_y_deg(float deg) { rotation_y_ = deg * M_PI / 180.0f; }
   void set_rotation_z_deg(float deg) { rotation_z_ = deg * M_PI / 180.0f; }
 
+  void set_sensitivity(int value) {
+    sensitivity_ = value;
+    this->radar_sensitivity(value);
+  }
+
   void setup() override {
     // this->radar_debug(3);
     this->radar_restart();
@@ -42,7 +47,7 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
     this->radar_report_interval(200);
     this->radar_monitor_interval(1);
     this->radar_heartbeat_timeout(10);
-    this->radar_sensitivity(2);
+    this->radar_sensitivity(sensitivity_);
     this->radar_seeking();
     this->radar_capture();
     if (auto *idf = static_cast<uart::IDFUARTComponent *>(this->parent_)) {
@@ -252,6 +257,7 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
   float rotation_x_ = 0.0f;
   float rotation_y_ = 0.0f;
   float rotation_z_ = 0.0f;
+  int sensitivity_ = 2;
 
   struct Person {
     uint32_t id;
