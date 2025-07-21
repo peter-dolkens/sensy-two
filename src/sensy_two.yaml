@@ -645,6 +645,7 @@ number:
     step: 1
     optimistic: true
     restore_value: true
+    entity_category: diagnostic
     on_value:
       then:
         - lambda: |-
@@ -659,11 +660,80 @@ number:
     step: 1
     optimistic: true
     restore_value: true
+    entity_category: diagnostic
     on_value:
       then:
         - lambda: |-
             id(sensy_component)->set_sensitivity(
               (int)id(radar_sensitivity).state);
+
+  - platform: template
+    id: radar_report_interval
+    name: "RADAR | Report Interval"
+    min_value: 100
+    max_value: 10000
+    step: 100
+    unit_of_measurement: "ms"
+    optimistic: true
+    restore_value: true
+    initial_value: 200
+    entity_category: diagnostic
+    on_value:
+      then:
+        - lambda: |-
+            id(sensy_component)->set_report_interval_ms(
+              (int)id(radar_report_interval).state);
+
+  - platform: template
+    id: radar_monitor_interval
+    name: "RADAR | Monitor Interval"
+    min_value: 1
+    max_value: 99
+    step: 1
+    unit_of_measurement: "s"
+    optimistic: true
+    restore_value: true
+    initial_value: 1
+    entity_category: diagnostic
+    on_value:
+      then:
+        - lambda: |-
+            id(sensy_component)->set_monitor_interval_s(
+              (int)id(radar_monitor_interval).state);
+
+  - platform: template
+    id: radar_heartbeat_interval
+    name: "RADAR | Heartbeat Interval"
+    min_value: 10
+    max_value: 99
+    step: 1
+    unit_of_measurement: "s"
+    optimistic: true
+    restore_value: true
+    initial_value: 10
+    entity_category: diagnostic
+    on_value:
+      then:
+        - lambda: |-
+            id(sensy_component)->set_heartbeat_interval_s(
+              (int)id(radar_heartbeat_interval).state);
+
+  - platform: template
+    id: radar_range
+    name: "RADAR | Range"
+    min_value: 10
+    max_value: 1000
+    step: 10
+    unit_of_measurement: "cm"
+    optimistic: true
+    restore_value: true
+    initial_value: 600
+    entity_category: diagnostic
+    on_value:
+      then:
+        - lambda: |-
+            id(sensy_component)->set_range_cm(
+              (int)id(radar_range).state);
 
   - platform: template
     id: publish_interval
