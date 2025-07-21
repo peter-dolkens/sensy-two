@@ -242,6 +242,11 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
     float vx, vy, vz;
   } __attribute__((packed));
 
+  static constexpr uint32_t INVALID_ID = 0;
+  std::array<uint32_t, MAX_TARGETS> target_ids_{};
+  std::array<uint32_t, MAX_TARGETS> target_last_seen_{};
+  std::vector<Person> persons_buffer_;
+
   void read_uart() {
     uint8_t temp[128];
     while (this->available()) {
@@ -364,6 +369,7 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
           if (tlv_type_ == 0x01) {
             state_ = READING_POINTS;
           } else if (tlv_type_ == 0x02) {
+            persons_buffer_.clear();
             state_ = READING_PERSONS;
           } else {
             state_ = SEARCHING_HEADER; // Skip other TLV data
@@ -371,19 +377,17 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
         }
         break;
       case READING_PERSONS:
-        if (item_index_ == 0) {
-          clear_targets();
-        }
         if (available_ring() >= sizeof(Person)) {
           Person p;
           read_ring((uint8_t *)&p, sizeof(Person));
           bytes_read_ += sizeof(Person);
-          publish_target(item_index_, p);
-          item_index_++;
-          if (bytes_read_ >= tlv_len_) {
-            frame_remaining_ -= tlv_len_;
-            state_ = (frame_remaining_ >= 8) ? READING_TLV_HEADER : SEARCHING_HEADER;
-          }
+          persons_buffer_.push_back(p);
+        }
+        if (bytes_read_ >= tlv_len_) {
+          assign_persons(persons_buffer_);
+          persons_buffer_.clear();
+          frame_remaining_ -= tlv_len_;
+          state_ = (frame_remaining_ >= 8) ? READING_TLV_HEADER : SEARCHING_HEADER;
         }
         break;
       case READING_POINTS:
@@ -438,6 +442,60 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
       speed_sensors_[i]->publish_state(0);
       distance_resolution_sensors_[i]->publish_state(0);
       distance_sensors_[i]->publish_state(0);
+    }
+  }
+
+  size_t find_index_for_id(uint32_t id) const {
+    for (size_t i = 0; i < MAX_TARGETS; ++i) {
+      if (target_ids_[i] == id) return i;
+    }
+    return MAX_TARGETS;
+  }
+
+  size_t allocate_index_for_id(uint32_t id) {
+    for (size_t i = 0; i < MAX_TARGETS; ++i) {
+      if (target_ids_[i] == INVALID_ID) {
+        target_ids_[i] = id;
+        return i;
+      }
+    }
+    size_t oldest = 0;
+    for (size_t i = 1; i < MAX_TARGETS; ++i) {
+      if (target_last_seen_[i] < target_last_seen_[oldest]) {
+        oldest = i;
+      }
+    }
+    target_ids_[oldest] = id;
+    return oldest;
+  }
+
+  void publish_empty(size_t index) {
+    x_sensors_[index]->publish_state(0);
+    y_sensors_[index]->publish_state(0);
+    z_sensors_[index]->publish_state(0);
+    angle_sensors_[index]->publish_state(0);
+    speed_sensors_[index]->publish_state(0);
+    distance_resolution_sensors_[index]->publish_state(0);
+    distance_sensors_[index]->publish_state(0);
+  }
+
+  void assign_persons(const std::vector<Person> &persons) {
+    std::array<bool, MAX_TARGETS> seen{};
+    seen.fill(false);
+    for (const auto &p : persons) {
+      size_t idx = find_index_for_id(p.id);
+      if (idx == MAX_TARGETS) {
+        idx = allocate_index_for_id(p.id);
+      }
+      publish_target(idx, p);
+      target_last_seen_[idx] = frame_no_;
+      seen[idx] = true;
+    }
+    for (size_t i = 0; i < MAX_TARGETS; ++i) {
+      if (!seen[i] && target_last_seen_[i] != frame_no_) {
+        publish_empty(i);
+        target_ids_[i] = INVALID_ID;
+      }
     }
   }
 };
