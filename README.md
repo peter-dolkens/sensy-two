@@ -3,12 +3,12 @@
 This repository contains an example ESPHome component to interface with the
 Sensy-Two mmWave radar sensor. The implementation is derived from an Arduino
 example and parses the radar data stream to publish information about up to
-three detected targets.
+ten detected targets.
 
 ## Component
 
 `src/components/sensy_two/sensy_two_component.h` implements the parser and publishes sensor values for the
-position and velocity of the first three targets reported by the sensor. The
+position and velocity of the first ten targets reported by the sensor. The
 component sends the initial configuration commands used in the Arduino sketch
 and then continuously reads the UART stream to decode TLV frames.
 

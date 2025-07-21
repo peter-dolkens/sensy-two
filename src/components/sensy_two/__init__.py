@@ -10,28 +10,20 @@ sensytwo_ns = cg.esphome_ns.namespace("sensytwo")
 SensyTwoComponent = sensytwo_ns.class_("SensyTwoComponent", cg.Component, uart.UARTDevice)
 
 
+FIELDS = [
+    "x",
+    "y",
+    "z",
+    "angle",
+    "speed",
+    "distance_resolution",
+    "distance",
+]
+
 SENSOR_KEYS = [
-    "t1_x",
-    "t1_y",
-    "t1_z",
-    "t1_angle",
-    "t1_speed",
-    "t1_distance_resolution",
-    "t1_distance",
-    "t2_x",
-    "t2_y",
-    "t2_z",
-    "t2_angle",
-    "t2_speed",
-    "t2_distance_resolution",
-    "t2_distance",
-    "t3_x",
-    "t3_y",
-    "t3_z",
-    "t3_angle",
-    "t3_speed",
-    "t3_distance_resolution",
-    "t3_distance",
+    f"t{i}_{field}"
+    for i in range(1, 11)
+    for field in FIELDS
 ]
 
 TEXT_SENSOR_KEYS = [
