@@ -545,6 +545,7 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
     raw_targets_[index] = {};
   }
 
+ public:
   int count_targets_in_zone(float x0, float x1, float y0, float y1,
                             float ex_x0, float ex_x1, float ex_y0,
                             float ex_y1) const {
@@ -575,6 +576,7 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
     return count;
   }
 
+ protected:
   void assign_persons(const std::vector<Person> &persons) {
     ESP_LOGI("SensyTwo", "Assigning %zu persons", persons.size());
     std::array<bool, MAX_TARGETS> seen{};
