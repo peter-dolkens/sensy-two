@@ -396,6 +396,18 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
       float x = raw_targets_[index].x;
       float y = raw_targets_[index].y;
       float z = raw_targets_[index].z;
+      if (fabsf(x) < 1e-4f && fabsf(y) < 1e-4f && fabsf(z) < 1e-4f) {
+        // ignore zero coordinates, publish unknown
+        x_sensors_[index]->publish_state(NAN);
+        y_sensors_[index]->publish_state(NAN);
+        z_sensors_[index]->publish_state(NAN);
+        angle_sensors_[index]->publish_state(NAN);
+        speed_sensors_[index]->publish_state(NAN);
+        distance_resolution_sensors_[index]->publish_state(NAN);
+        distance_sensors_[index]->publish_state(NAN);
+        last_published_time_[index] = now;
+        return;
+      }
       float vx = raw_targets_[index].vx;
       float vy = raw_targets_[index].vy;
       float vz = raw_targets_[index].vz;
@@ -404,11 +416,13 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
       float distance = sqrtf(x * x + y * y + z * z);
       float angle = (distance > 0.0f) ? atan2f(x, y) * 180.0f / M_PI : 0.0f;
       float speed = sqrtf(vx * vx + vy * vy + vz * vz);
+      auto r2 = [](float v) { return roundf(v * 100.0f) / 100.0f; };
       if (distance > detection_range_threshold_) {
         state.values = {0, 0, 0, 0, 0, 0, 0, 0};
       } else {
-        state.values = {x * 100, y * 100, z * 100, angle, speed * 100, 0,
-                        distance * 100, raw_targets_[index].q * 1.0f};
+        state.values = {r2(x * 100), r2(y * 100), r2(z * 100), r2(angle),
+                        r2(speed * 100), 0, r2(distance * 100),
+                        raw_targets_[index].q * 1.0f};
       }
     } else {
       state.values = {0, 0, 0, 0, 0, 0, 0, 0};
@@ -582,6 +596,14 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
     std::array<bool, MAX_TARGETS> seen{};
     seen.fill(false);
     for (const auto &p : persons) {
+      if (fabsf(p.x) < 1e-4f && fabsf(p.y) < 1e-4f && fabsf(p.z) < 1e-4f) {
+        size_t idx = find_index_for_id(p.id);
+        if (idx != MAX_TARGETS) {
+          publish_empty(idx);
+          target_ids_[idx] = INVALID_ID;
+        }
+        continue;
+      }
       size_t idx = find_index_for_id(p.id);
       if (idx == MAX_TARGETS) {
         idx = allocate_index_for_id(p.id);

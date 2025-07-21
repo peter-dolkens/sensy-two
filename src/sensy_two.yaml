@@ -1,11 +1,12 @@
+---
 esphome:
   name: sensy-two
-  friendly_name: Sensy Two 
-  name_add_mac_suffix: True
-  project: 
+  friendly_name: Sensy Two
+  name_add_mac_suffix: true
+  project:
     name: Sensy-Two.S2 mmWave Sensor
     version: v0.0.1
-    
+
   includes:
     - components/sensy_two/sensy_two_component.h
 
@@ -636,7 +637,9 @@ number:
     restore_value: true
     on_value:
       then:
-        - lambda: 'id(sensy_component)->set_detection_range_threshold(id(detection_threshold).state);'
+        - lambda: |-
+            id(sensy_component)->set_detection_range_threshold(
+              id(detection_threshold).state);
 
   - platform: template
     id: publish_interval
@@ -649,7 +652,9 @@ number:
     restore_value: true
     on_value:
       then:
-        - lambda: 'id(sensy_component)->set_publish_interval_ms(id(publish_interval).state);'
+        - lambda: |-
+            id(sensy_component)->set_publish_interval_ms(
+              id(publish_interval).state);
 
   - platform: template
     id: rotation_x
@@ -661,7 +666,9 @@ number:
     restore_value: true
     on_value:
       then:
-        - lambda: 'id(sensy_component)->set_rotation_x_deg(id(rotation_x).state);'
+        - lambda: |-
+            id(sensy_component)->set_rotation_x_deg(
+              id(rotation_x).state);
 
   - platform: template
     id: rotation_y
@@ -673,7 +680,9 @@ number:
     restore_value: true
     on_value:
       then:
-        - lambda: 'id(sensy_component)->set_rotation_y_deg(id(rotation_y).state);'
+        - lambda: |-
+            id(sensy_component)->set_rotation_y_deg(
+              id(rotation_y).state);
 
   - platform: template
     id: rotation_z
@@ -685,7 +694,9 @@ number:
     restore_value: true
     on_value:
       then:
-        - lambda: 'id(sensy_component)->set_rotation_z_deg(id(rotation_z).state);'
+        - lambda: |-
+            id(sensy_component)->set_rotation_z_deg(
+              id(rotation_z).state);
 
 button:
   - platform: template
@@ -710,15 +721,6 @@ sensor:
         id(exclusion_x_begin).state, id(exclusion_x_end).state,
         id(exclusion_y_begin).state, id(exclusion_y_end).state);
 
-  - platform: template
-    name: "Zone 1 Presence"
-    update_interval: 50000ms
-    lambda: |-
-      return id(sensy_component)->count_targets_in_zone(
-        id(zone1_x_begin).state, id(zone1_x_end).state,
-        id(zone1_y_begin).state, id(zone1_y_end).state,
-        id(exclusion_x_begin).state, id(exclusion_x_end).state,
-        id(exclusion_y_begin).state, id(exclusion_y_end).state) > 0;
 
   - platform: template
     name: "Zone 2 Targets"
@@ -730,15 +732,6 @@ sensor:
         id(exclusion_x_begin).state, id(exclusion_x_end).state,
         id(exclusion_y_begin).state, id(exclusion_y_end).state);
 
-  - platform: template
-    name: "Zone 2 Presence"
-    update_interval: 50000ms
-    lambda: |-
-      return id(sensy_component)->count_targets_in_zone(
-        id(zone2_x_begin).state, id(zone2_x_end).state,
-        id(zone2_y_begin).state, id(zone2_y_end).state,
-        id(exclusion_x_begin).state, id(exclusion_x_end).state,
-        id(exclusion_y_begin).state, id(exclusion_y_end).state) > 0;
 
   - platform: template
     name: "Zone 3 Targets"
@@ -750,15 +743,36 @@ sensor:
         id(exclusion_x_begin).state, id(exclusion_x_end).state,
         id(exclusion_y_begin).state, id(exclusion_y_end).state);
 
+binary_sensor:
+  - platform: template
+    name: "Zone 1 Presence"
+    device_class: presence
+    lambda: |-
+      return id(sensy_component)->count_targets_in_zone(
+        id(zone1_x_begin).state, id(zone1_x_end).state,
+        id(zone1_y_begin).state, id(zone1_y_end).state,
+        id(exclusion_x_begin).state, id(exclusion_x_end).state,
+        id(exclusion_y_begin).state, id(exclusion_y_end).state) > 0;
+    update_interval: 50000ms
+
+  - platform: template
+    name: "Zone 2 Presence"
+    device_class: presence
+    lambda: |-
+      return id(sensy_component)->count_targets_in_zone(
+        id(zone2_x_begin).state, id(zone2_x_end).state,
+        id(zone2_y_begin).state, id(zone2_y_end).state,
+        id(exclusion_x_begin).state, id(exclusion_x_end).state,
+        id(exclusion_y_begin).state, id(exclusion_y_end).state) > 0;
+    update_interval: 50000ms
+
   - platform: template
     name: "Zone 3 Presence"
-    update_interval: 50000ms
+    device_class: presence
     lambda: |-
       return id(sensy_component)->count_targets_in_zone(
         id(zone3_x_begin).state, id(zone3_x_end).state,
         id(zone3_y_begin).state, id(zone3_y_end).state,
         id(exclusion_x_begin).state, id(exclusion_x_end).state,
         id(exclusion_y_begin).state, id(exclusion_y_end).state) > 0;
-
-
-
+    update_interval: 50000ms
