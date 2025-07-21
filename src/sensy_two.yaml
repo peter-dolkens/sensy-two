@@ -652,6 +652,20 @@ number:
               id(detection_threshold).state);
 
   - platform: template
+    id: radar_sensitivity
+    name: "Sensitivity"
+    min_value: 1
+    max_value: 19
+    step: 1
+    optimistic: true
+    restore_value: true
+    on_value:
+      then:
+        - lambda: |-
+            id(sensy_component)->set_sensitivity(
+              (int)id(radar_sensitivity).state);
+
+  - platform: template
     id: publish_interval
     name: "Publish Interval"
     min_value: 100
