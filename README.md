@@ -41,6 +41,9 @@ sensy_two:
     name: "RADAR | MAC"
 ```
 
+Target sensors are exposed as `Target 01` through `Target 10` with fields for
+X, Y, Z, angle, speed and distance.
+
 This will create sensors for each detected target including position (x and y),
 angle, speed and distance. The example configuration also exposes number
 entities to configure up to three detection zones and an optional exclusion

@@ -91,121 +91,401 @@ sensy_two:
   uart_id: ms72sf1
   t1_x:
     id: t1_x
-    name: "Target 1 X Coordinate"
+    name: "Target 01 X Coordinate"
     unit_of_measurement: "cm"
     accuracy_decimals: 2
     icon: mdi:alpha-x-box-outline
   t1_y:
     id: t1_y
-    name: "Target 1 Y Coordinate"
+    name: "Target 01 Y Coordinate"
     unit_of_measurement: "cm"
     accuracy_decimals: 2
     icon: mdi:alpha-y-box-outline
   t1_z:
     id: t1_z
-    name: "Target 1 Z Coordinate"
+    name: "Target 01 Z Coordinate"
     unit_of_measurement: "cm"
     accuracy_decimals: 2
     icon: mdi:alpha-z-box-outline
   t1_angle:
     id: t1_angle
-    name: "Target 1 Angle"
+    name: "Target 01 Angle"
     unit_of_measurement: "°"
     accuracy_decimals: 2
     icon: mdi:format-text-rotation-angle-up
   t1_speed:
     id: t1_speed
-    name: "Target 1 Speed"
+    name: "Target 01 Speed"
     unit_of_measurement: "cm/s"
     icon: mdi:speedometer
   t1_distance_resolution:
     id: t1_distance_resolution
-    name: "Target 1 Distance Resolution"
+    name: "Target 01 Distance Resolution"
     unit_of_measurement: "cm"
     icon: mdi:diameter-outline
   t1_distance:
     id: t1_distance
-    name: "Target 1 Distance"
+    name: "Target 01 Distance"
     unit_of_measurement: "cm"
     accuracy_decimals: 2
     icon: mdi:map-marker-distance
   t2_x:
     id: t2_x
-    name: "Target 2 X Coordinate"
+    name: "Target 02 X Coordinate"
     unit_of_measurement: "cm"
     accuracy_decimals: 2
     icon: mdi:alpha-x-box-outline
   t2_y:
     id: t2_y
-    name: "Target 2 Y Coordinate"
+    name: "Target 02 Y Coordinate"
     unit_of_measurement: "cm"
     accuracy_decimals: 2
     icon: mdi:alpha-y-box-outline
   t2_z:
     id: t2_z
-    name: "Target 2 Z Coordinate"
+    name: "Target 02 Z Coordinate"
     unit_of_measurement: "cm"
     accuracy_decimals: 2
     icon: mdi:alpha-z-box-outline
   t2_angle:
     id: t2_angle
-    name: "Target 2 Angle"
+    name: "Target 02 Angle"
     unit_of_measurement: "°"
     accuracy_decimals: 2
     icon: mdi:format-text-rotation-angle-up
   t2_speed:
     id: t2_speed
-    name: "Target 2 Speed"
+    name: "Target 02 Speed"
     unit_of_measurement: "cm/s"
     icon: mdi:speedometer
   t2_distance_resolution:
     id: t2_distance_resolution
-    name: "Target 2 Distance Resolution"
+    name: "Target 02 Distance Resolution"
     unit_of_measurement: "cm"
     icon: mdi:diameter-outline
   t2_distance:
     id: t2_distance
-    name: "Target 2 Distance"
+    name: "Target 02 Distance"
     unit_of_measurement: "cm"
     accuracy_decimals: 2
     icon: mdi:map-marker-distance
   t3_x:
     id: t3_x
-    name: "Target 3 X Coordinate"
+    name: "Target 03 X Coordinate"
     unit_of_measurement: "cm"
     accuracy_decimals: 2
     icon: mdi:alpha-x-box-outline
   t3_y:
     id: t3_y
-    name: "Target 3 Y Coordinate"
+    name: "Target 03 Y Coordinate"
     unit_of_measurement: "cm"
     accuracy_decimals: 2
     icon: mdi:alpha-y-box-outline
   t3_z:
     id: t3_z
-    name: "Target 3 Z Coordinate"
+    name: "Target 03 Z Coordinate"
     unit_of_measurement: "cm"
     accuracy_decimals: 2
     icon: mdi:alpha-z-box-outline
   t3_angle:
     id: t3_angle
-    name: "Target 3 Angle"
+    name: "Target 03 Angle"
     unit_of_measurement: "°"
     accuracy_decimals: 2
     icon: mdi:format-text-rotation-angle-up
   t3_speed:
     id: t3_speed
-    name: "Target 3 Speed"
+    name: "Target 03 Speed"
     unit_of_measurement: "cm/s"
     icon: mdi:speedometer
   t3_distance_resolution:
     id: t3_distance_resolution
-    name: "Target 3 Distance Resolution"
+    name: "Target 03 Distance Resolution"
     unit_of_measurement: "cm"
     icon: mdi:diameter-outline
   t3_distance:
     id: t3_distance
-    name: "Target 3 Distance"
+    name: "Target 03 Distance"
+    unit_of_measurement: "cm"
+    accuracy_decimals: 2
+    icon: mdi:map-marker-distance
+  t4_x:
+    id: t4_x
+    name: "Target 04 X Coordinate"
+    unit_of_measurement: "cm"
+    accuracy_decimals: 2
+    icon: mdi:alpha-x-box-outline
+  t4_y:
+    id: t4_y
+    name: "Target 04 Y Coordinate"
+    unit_of_measurement: "cm"
+    accuracy_decimals: 2
+    icon: mdi:alpha-y-box-outline
+  t4_z:
+    id: t4_z
+    name: "Target 04 Z Coordinate"
+    unit_of_measurement: "cm"
+    accuracy_decimals: 2
+    icon: mdi:alpha-z-box-outline
+  t4_angle:
+    id: t4_angle
+    name: "Target 04 Angle"
+    unit_of_measurement: "°"
+    accuracy_decimals: 2
+    icon: mdi:format-text-rotation-angle-up
+  t4_speed:
+    id: t4_speed
+    name: "Target 04 Speed"
+    unit_of_measurement: "cm/s"
+    icon: mdi:speedometer
+  t4_distance_resolution:
+    id: t4_distance_resolution
+    name: "Target 04 Distance Resolution"
+    unit_of_measurement: "cm"
+    icon: mdi:diameter-outline
+  t4_distance:
+    id: t4_distance
+    name: "Target 04 Distance"
+    unit_of_measurement: "cm"
+    accuracy_decimals: 2
+    icon: mdi:map-marker-distance
+  t5_x:
+    id: t5_x
+    name: "Target 05 X Coordinate"
+    unit_of_measurement: "cm"
+    accuracy_decimals: 2
+    icon: mdi:alpha-x-box-outline
+  t5_y:
+    id: t5_y
+    name: "Target 05 Y Coordinate"
+    unit_of_measurement: "cm"
+    accuracy_decimals: 2
+    icon: mdi:alpha-y-box-outline
+  t5_z:
+    id: t5_z
+    name: "Target 05 Z Coordinate"
+    unit_of_measurement: "cm"
+    accuracy_decimals: 2
+    icon: mdi:alpha-z-box-outline
+  t5_angle:
+    id: t5_angle
+    name: "Target 05 Angle"
+    unit_of_measurement: "°"
+    accuracy_decimals: 2
+    icon: mdi:format-text-rotation-angle-up
+  t5_speed:
+    id: t5_speed
+    name: "Target 05 Speed"
+    unit_of_measurement: "cm/s"
+    icon: mdi:speedometer
+  t5_distance_resolution:
+    id: t5_distance_resolution
+    name: "Target 05 Distance Resolution"
+    unit_of_measurement: "cm"
+    icon: mdi:diameter-outline
+  t5_distance:
+    id: t5_distance
+    name: "Target 05 Distance"
+    unit_of_measurement: "cm"
+    accuracy_decimals: 2
+    icon: mdi:map-marker-distance
+  t6_x:
+    id: t6_x
+    name: "Target 06 X Coordinate"
+    unit_of_measurement: "cm"
+    accuracy_decimals: 2
+    icon: mdi:alpha-x-box-outline
+  t6_y:
+    id: t6_y
+    name: "Target 06 Y Coordinate"
+    unit_of_measurement: "cm"
+    accuracy_decimals: 2
+    icon: mdi:alpha-y-box-outline
+  t6_z:
+    id: t6_z
+    name: "Target 06 Z Coordinate"
+    unit_of_measurement: "cm"
+    accuracy_decimals: 2
+    icon: mdi:alpha-z-box-outline
+  t6_angle:
+    id: t6_angle
+    name: "Target 06 Angle"
+    unit_of_measurement: "°"
+    accuracy_decimals: 2
+    icon: mdi:format-text-rotation-angle-up
+  t6_speed:
+    id: t6_speed
+    name: "Target 06 Speed"
+    unit_of_measurement: "cm/s"
+    icon: mdi:speedometer
+  t6_distance_resolution:
+    id: t6_distance_resolution
+    name: "Target 06 Distance Resolution"
+    unit_of_measurement: "cm"
+    icon: mdi:diameter-outline
+  t6_distance:
+    id: t6_distance
+    name: "Target 06 Distance"
+    unit_of_measurement: "cm"
+    accuracy_decimals: 2
+    icon: mdi:map-marker-distance
+  t7_x:
+    id: t7_x
+    name: "Target 07 X Coordinate"
+    unit_of_measurement: "cm"
+    accuracy_decimals: 2
+    icon: mdi:alpha-x-box-outline
+  t7_y:
+    id: t7_y
+    name: "Target 07 Y Coordinate"
+    unit_of_measurement: "cm"
+    accuracy_decimals: 2
+    icon: mdi:alpha-y-box-outline
+  t7_z:
+    id: t7_z
+    name: "Target 07 Z Coordinate"
+    unit_of_measurement: "cm"
+    accuracy_decimals: 2
+    icon: mdi:alpha-z-box-outline
+  t7_angle:
+    id: t7_angle
+    name: "Target 07 Angle"
+    unit_of_measurement: "°"
+    accuracy_decimals: 2
+    icon: mdi:format-text-rotation-angle-up
+  t7_speed:
+    id: t7_speed
+    name: "Target 07 Speed"
+    unit_of_measurement: "cm/s"
+    icon: mdi:speedometer
+  t7_distance_resolution:
+    id: t7_distance_resolution
+    name: "Target 07 Distance Resolution"
+    unit_of_measurement: "cm"
+    icon: mdi:diameter-outline
+  t7_distance:
+    id: t7_distance
+    name: "Target 07 Distance"
+    unit_of_measurement: "cm"
+    accuracy_decimals: 2
+    icon: mdi:map-marker-distance
+  t8_x:
+    id: t8_x
+    name: "Target 08 X Coordinate"
+    unit_of_measurement: "cm"
+    accuracy_decimals: 2
+    icon: mdi:alpha-x-box-outline
+  t8_y:
+    id: t8_y
+    name: "Target 08 Y Coordinate"
+    unit_of_measurement: "cm"
+    accuracy_decimals: 2
+    icon: mdi:alpha-y-box-outline
+  t8_z:
+    id: t8_z
+    name: "Target 08 Z Coordinate"
+    unit_of_measurement: "cm"
+    accuracy_decimals: 2
+    icon: mdi:alpha-z-box-outline
+  t8_angle:
+    id: t8_angle
+    name: "Target 08 Angle"
+    unit_of_measurement: "°"
+    accuracy_decimals: 2
+    icon: mdi:format-text-rotation-angle-up
+  t8_speed:
+    id: t8_speed
+    name: "Target 08 Speed"
+    unit_of_measurement: "cm/s"
+    icon: mdi:speedometer
+  t8_distance_resolution:
+    id: t8_distance_resolution
+    name: "Target 08 Distance Resolution"
+    unit_of_measurement: "cm"
+    icon: mdi:diameter-outline
+  t8_distance:
+    id: t8_distance
+    name: "Target 08 Distance"
+    unit_of_measurement: "cm"
+    accuracy_decimals: 2
+    icon: mdi:map-marker-distance
+  t9_x:
+    id: t9_x
+    name: "Target 09 X Coordinate"
+    unit_of_measurement: "cm"
+    accuracy_decimals: 2
+    icon: mdi:alpha-x-box-outline
+  t9_y:
+    id: t9_y
+    name: "Target 09 Y Coordinate"
+    unit_of_measurement: "cm"
+    accuracy_decimals: 2
+    icon: mdi:alpha-y-box-outline
+  t9_z:
+    id: t9_z
+    name: "Target 09 Z Coordinate"
+    unit_of_measurement: "cm"
+    accuracy_decimals: 2
+    icon: mdi:alpha-z-box-outline
+  t9_angle:
+    id: t9_angle
+    name: "Target 09 Angle"
+    unit_of_measurement: "°"
+    accuracy_decimals: 2
+    icon: mdi:format-text-rotation-angle-up
+  t9_speed:
+    id: t9_speed
+    name: "Target 09 Speed"
+    unit_of_measurement: "cm/s"
+    icon: mdi:speedometer
+  t9_distance_resolution:
+    id: t9_distance_resolution
+    name: "Target 09 Distance Resolution"
+    unit_of_measurement: "cm"
+    icon: mdi:diameter-outline
+  t9_distance:
+    id: t9_distance
+    name: "Target 09 Distance"
+    unit_of_measurement: "cm"
+    accuracy_decimals: 2
+    icon: mdi:map-marker-distance
+  t10_x:
+    id: t10_x
+    name: "Target 10 X Coordinate"
+    unit_of_measurement: "cm"
+    accuracy_decimals: 2
+    icon: mdi:alpha-x-box-outline
+  t10_y:
+    id: t10_y
+    name: "Target 10 Y Coordinate"
+    unit_of_measurement: "cm"
+    accuracy_decimals: 2
+    icon: mdi:alpha-y-box-outline
+  t10_z:
+    id: t10_z
+    name: "Target 10 Z Coordinate"
+    unit_of_measurement: "cm"
+    accuracy_decimals: 2
+    icon: mdi:alpha-z-box-outline
+  t10_angle:
+    id: t10_angle
+    name: "Target 10 Angle"
+    unit_of_measurement: "°"
+    accuracy_decimals: 2
+    icon: mdi:format-text-rotation-angle-up
+  t10_speed:
+    id: t10_speed
+    name: "Target 10 Speed"
+    unit_of_measurement: "cm/s"
+    icon: mdi:speedometer
+  t10_distance_resolution:
+    id: t10_distance_resolution
+    name: "Target 10 Distance Resolution"
+    unit_of_measurement: "cm"
+    icon: mdi:diameter-outline
+  t10_distance:
+    id: t10_distance
+    name: "Target 10 Distance"
     unit_of_measurement: "cm"
     accuracy_decimals: 2
     icon: mdi:map-marker-distance
@@ -399,6 +679,20 @@ sensor:
          && !ex(id(t2_x).state,id(t2_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
       if(in_rect(id(t3_x).state,id(t3_y).state,id(zone1_x_begin).state,id(zone1_x_end).state,id(zone1_y_begin).state,id(zone1_y_end).state)
          && !ex(id(t3_x).state,id(t3_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
+      if(in_rect(id(t4_x).state,id(t4_y).state,id(zone1_x_begin).state,id(zone1_x_end).state,id(zone1_y_begin).state,id(zone1_y_end).state)
+         && !ex(id(t4_x).state,id(t4_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
+      if(in_rect(id(t5_x).state,id(t5_y).state,id(zone1_x_begin).state,id(zone1_x_end).state,id(zone1_y_begin).state,id(zone1_y_end).state)
+         && !ex(id(t5_x).state,id(t5_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
+      if(in_rect(id(t6_x).state,id(t6_y).state,id(zone1_x_begin).state,id(zone1_x_end).state,id(zone1_y_begin).state,id(zone1_y_end).state)
+         && !ex(id(t6_x).state,id(t6_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
+      if(in_rect(id(t7_x).state,id(t7_y).state,id(zone1_x_begin).state,id(zone1_x_end).state,id(zone1_y_begin).state,id(zone1_y_end).state)
+         && !ex(id(t7_x).state,id(t7_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
+      if(in_rect(id(t8_x).state,id(t8_y).state,id(zone1_x_begin).state,id(zone1_x_end).state,id(zone1_y_begin).state,id(zone1_y_end).state)
+         && !ex(id(t8_x).state,id(t8_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
+      if(in_rect(id(t9_x).state,id(t9_y).state,id(zone1_x_begin).state,id(zone1_x_end).state,id(zone1_y_begin).state,id(zone1_y_end).state)
+         && !ex(id(t9_x).state,id(t9_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
+      if(in_rect(id(t10_x).state,id(t10_y).state,id(zone1_x_begin).state,id(zone1_x_end).state,id(zone1_y_begin).state,id(zone1_y_end).state)
+         && !ex(id(t10_x).state,id(t10_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
       return count;
 
   - platform: template
@@ -424,6 +718,20 @@ sensor:
          && !ex(id(t2_x).state,id(t2_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
       if(in_rect(id(t3_x).state,id(t3_y).state,id(zone1_x_begin).state,id(zone1_x_end).state,id(zone1_y_begin).state,id(zone1_y_end).state)
          && !ex(id(t3_x).state,id(t3_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
+      if(in_rect(id(t4_x).state,id(t4_y).state,id(zone1_x_begin).state,id(zone1_x_end).state,id(zone1_y_begin).state,id(zone1_y_end).state)
+         && !ex(id(t4_x).state,id(t4_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
+      if(in_rect(id(t5_x).state,id(t5_y).state,id(zone1_x_begin).state,id(zone1_x_end).state,id(zone1_y_begin).state,id(zone1_y_end).state)
+         && !ex(id(t5_x).state,id(t5_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
+      if(in_rect(id(t6_x).state,id(t6_y).state,id(zone1_x_begin).state,id(zone1_x_end).state,id(zone1_y_begin).state,id(zone1_y_end).state)
+         && !ex(id(t6_x).state,id(t6_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
+      if(in_rect(id(t7_x).state,id(t7_y).state,id(zone1_x_begin).state,id(zone1_x_end).state,id(zone1_y_begin).state,id(zone1_y_end).state)
+         && !ex(id(t7_x).state,id(t7_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
+      if(in_rect(id(t8_x).state,id(t8_y).state,id(zone1_x_begin).state,id(zone1_x_end).state,id(zone1_y_begin).state,id(zone1_y_end).state)
+         && !ex(id(t8_x).state,id(t8_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
+      if(in_rect(id(t9_x).state,id(t9_y).state,id(zone1_x_begin).state,id(zone1_x_end).state,id(zone1_y_begin).state,id(zone1_y_end).state)
+         && !ex(id(t9_x).state,id(t9_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
+      if(in_rect(id(t10_x).state,id(t10_y).state,id(zone1_x_begin).state,id(zone1_x_end).state,id(zone1_y_begin).state,id(zone1_y_end).state)
+         && !ex(id(t10_x).state,id(t10_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
       return det;
 
   - platform: template
@@ -449,6 +757,20 @@ sensor:
          && !ex(id(t2_x).state,id(t2_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
       if(in_rect(id(t3_x).state,id(t3_y).state,id(zone2_x_begin).state,id(zone2_x_end).state,id(zone2_y_begin).state,id(zone2_y_end).state)
          && !ex(id(t3_x).state,id(t3_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
+      if(in_rect(id(t4_x).state,id(t4_y).state,id(zone2_x_begin).state,id(zone2_x_end).state,id(zone2_y_begin).state,id(zone2_y_end).state)
+         && !ex(id(t4_x).state,id(t4_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
+      if(in_rect(id(t5_x).state,id(t5_y).state,id(zone2_x_begin).state,id(zone2_x_end).state,id(zone2_y_begin).state,id(zone2_y_end).state)
+         && !ex(id(t5_x).state,id(t5_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
+      if(in_rect(id(t6_x).state,id(t6_y).state,id(zone2_x_begin).state,id(zone2_x_end).state,id(zone2_y_begin).state,id(zone2_y_end).state)
+         && !ex(id(t6_x).state,id(t6_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
+      if(in_rect(id(t7_x).state,id(t7_y).state,id(zone2_x_begin).state,id(zone2_x_end).state,id(zone2_y_begin).state,id(zone2_y_end).state)
+         && !ex(id(t7_x).state,id(t7_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
+      if(in_rect(id(t8_x).state,id(t8_y).state,id(zone2_x_begin).state,id(zone2_x_end).state,id(zone2_y_begin).state,id(zone2_y_end).state)
+         && !ex(id(t8_x).state,id(t8_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
+      if(in_rect(id(t9_x).state,id(t9_y).state,id(zone2_x_begin).state,id(zone2_x_end).state,id(zone2_y_begin).state,id(zone2_y_end).state)
+         && !ex(id(t9_x).state,id(t9_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
+      if(in_rect(id(t10_x).state,id(t10_y).state,id(zone2_x_begin).state,id(zone2_x_end).state,id(zone2_y_begin).state,id(zone2_y_end).state)
+         && !ex(id(t10_x).state,id(t10_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
       return count;
 
   - platform: template
@@ -474,6 +796,20 @@ sensor:
          && !ex(id(t2_x).state,id(t2_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
       if(in_rect(id(t3_x).state,id(t3_y).state,id(zone2_x_begin).state,id(zone2_x_end).state,id(zone2_y_begin).state,id(zone2_y_end).state)
          && !ex(id(t3_x).state,id(t3_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
+      if(in_rect(id(t4_x).state,id(t4_y).state,id(zone2_x_begin).state,id(zone2_x_end).state,id(zone2_y_begin).state,id(zone2_y_end).state)
+         && !ex(id(t4_x).state,id(t4_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
+      if(in_rect(id(t5_x).state,id(t5_y).state,id(zone2_x_begin).state,id(zone2_x_end).state,id(zone2_y_begin).state,id(zone2_y_end).state)
+         && !ex(id(t5_x).state,id(t5_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
+      if(in_rect(id(t6_x).state,id(t6_y).state,id(zone2_x_begin).state,id(zone2_x_end).state,id(zone2_y_begin).state,id(zone2_y_end).state)
+         && !ex(id(t6_x).state,id(t6_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
+      if(in_rect(id(t7_x).state,id(t7_y).state,id(zone2_x_begin).state,id(zone2_x_end).state,id(zone2_y_begin).state,id(zone2_y_end).state)
+         && !ex(id(t7_x).state,id(t7_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
+      if(in_rect(id(t8_x).state,id(t8_y).state,id(zone2_x_begin).state,id(zone2_x_end).state,id(zone2_y_begin).state,id(zone2_y_end).state)
+         && !ex(id(t8_x).state,id(t8_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
+      if(in_rect(id(t9_x).state,id(t9_y).state,id(zone2_x_begin).state,id(zone2_x_end).state,id(zone2_y_begin).state,id(zone2_y_end).state)
+         && !ex(id(t9_x).state,id(t9_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
+      if(in_rect(id(t10_x).state,id(t10_y).state,id(zone2_x_begin).state,id(zone2_x_end).state,id(zone2_y_begin).state,id(zone2_y_end).state)
+         && !ex(id(t10_x).state,id(t10_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
       return det;
 
   - platform: template
@@ -499,6 +835,20 @@ sensor:
          && !ex(id(t2_x).state,id(t2_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
       if(in_rect(id(t3_x).state,id(t3_y).state,id(zone3_x_begin).state,id(zone3_x_end).state,id(zone3_y_begin).state,id(zone3_y_end).state)
          && !ex(id(t3_x).state,id(t3_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
+      if(in_rect(id(t4_x).state,id(t4_y).state,id(zone3_x_begin).state,id(zone3_x_end).state,id(zone3_y_begin).state,id(zone3_y_end).state)
+         && !ex(id(t4_x).state,id(t4_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
+      if(in_rect(id(t5_x).state,id(t5_y).state,id(zone3_x_begin).state,id(zone3_x_end).state,id(zone3_y_begin).state,id(zone3_y_end).state)
+         && !ex(id(t5_x).state,id(t5_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
+      if(in_rect(id(t6_x).state,id(t6_y).state,id(zone3_x_begin).state,id(zone3_x_end).state,id(zone3_y_begin).state,id(zone3_y_end).state)
+         && !ex(id(t6_x).state,id(t6_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
+      if(in_rect(id(t7_x).state,id(t7_y).state,id(zone3_x_begin).state,id(zone3_x_end).state,id(zone3_y_begin).state,id(zone3_y_end).state)
+         && !ex(id(t7_x).state,id(t7_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
+      if(in_rect(id(t8_x).state,id(t8_y).state,id(zone3_x_begin).state,id(zone3_x_end).state,id(zone3_y_begin).state,id(zone3_y_end).state)
+         && !ex(id(t8_x).state,id(t8_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
+      if(in_rect(id(t9_x).state,id(t9_y).state,id(zone3_x_begin).state,id(zone3_x_end).state,id(zone3_y_begin).state,id(zone3_y_end).state)
+         && !ex(id(t9_x).state,id(t9_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
+      if(in_rect(id(t10_x).state,id(t10_y).state,id(zone3_x_begin).state,id(zone3_x_end).state,id(zone3_y_begin).state,id(zone3_y_end).state)
+         && !ex(id(t10_x).state,id(t10_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
       return count;
 
   - platform: template
@@ -524,6 +874,20 @@ sensor:
          && !ex(id(t2_x).state,id(t2_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
       if(in_rect(id(t3_x).state,id(t3_y).state,id(zone3_x_begin).state,id(zone3_x_end).state,id(zone3_y_begin).state,id(zone3_y_end).state)
          && !ex(id(t3_x).state,id(t3_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
+      if(in_rect(id(t4_x).state,id(t4_y).state,id(zone3_x_begin).state,id(zone3_x_end).state,id(zone3_y_begin).state,id(zone3_y_end).state)
+         && !ex(id(t4_x).state,id(t4_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
+      if(in_rect(id(t5_x).state,id(t5_y).state,id(zone3_x_begin).state,id(zone3_x_end).state,id(zone3_y_begin).state,id(zone3_y_end).state)
+         && !ex(id(t5_x).state,id(t5_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
+      if(in_rect(id(t6_x).state,id(t6_y).state,id(zone3_x_begin).state,id(zone3_x_end).state,id(zone3_y_begin).state,id(zone3_y_end).state)
+         && !ex(id(t6_x).state,id(t6_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
+      if(in_rect(id(t7_x).state,id(t7_y).state,id(zone3_x_begin).state,id(zone3_x_end).state,id(zone3_y_begin).state,id(zone3_y_end).state)
+         && !ex(id(t7_x).state,id(t7_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
+      if(in_rect(id(t8_x).state,id(t8_y).state,id(zone3_x_begin).state,id(zone3_x_end).state,id(zone3_y_begin).state,id(zone3_y_end).state)
+         && !ex(id(t8_x).state,id(t8_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
+      if(in_rect(id(t9_x).state,id(t9_y).state,id(zone3_x_begin).state,id(zone3_x_end).state,id(zone3_y_begin).state,id(zone3_y_end).state)
+         && !ex(id(t9_x).state,id(t9_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
+      if(in_rect(id(t10_x).state,id(t10_y).state,id(zone3_x_begin).state,id(zone3_x_end).state,id(zone3_y_begin).state,id(zone3_y_end).state)
+         && !ex(id(t10_x).state,id(t10_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
       return det;
 
 
