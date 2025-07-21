@@ -32,7 +32,7 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
   }
 
   void setup() override {
-    this->radar_debug(3);
+    // this->radar_debug(3);
     this->radar_restart();
     this->radar_start();
     this->radar_report_interval(200);
@@ -46,6 +46,9 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
       uart_queue_ = idf->get_uart_event_queue();
       xTaskCreatePinnedToCore(uart_task, "sensy_uart", 4096, this, 1, &task_handle_, 1);
     }
+
+    this->read_firmware();
+    this->read_mac_address();
   }
 
   void radar_debug(int level) {
@@ -448,9 +451,9 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
 
     TargetState state;
     if (distance > detection_range_threshold_) {
-      state.values = {0, 0, 0, 0, 0, 0, 0};
+      state.values = {0, 0, 0, 0, 0, 0, 0, 0};
     } else {
-      state.values = {p.x, p.y, p.z, angle, speed, 0, distance};
+      state.values = {p.x * 100, p.y * 100, p.z * 100, angle, speed * 100, 0, distance * 100, resolution * 1.0};
     }
     current_state_[index] = state;
 
@@ -459,7 +462,7 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
 
   void clear_targets() {
     for (size_t i = 0; i < MAX_TARGETS; ++i) {
-      current_state_[i].values = {0, 0, 0, 0, 0, 0, 0};
+      current_state_[i].values = {0, 0, 0, 0, 0, 0, 0, 0};
       maybe_publish(i);
     }
   }
@@ -490,11 +493,12 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
 
   void publish_empty(size_t index) {
     if (index >= MAX_TARGETS) return;
-    current_state_[index].values = {0, 0, 0, 0, 0, 0, 0};
+    current_state_[index].values = {0, 0, 0, 0, 0, 0, 0, 0};
     maybe_publish(index);
   }
 
   void assign_persons(const std::vector<Person> &persons) {
+    ESP_LOGI("SensyTwo", "Assigning %zu persons", persons.size());
     std::array<bool, MAX_TARGETS> seen{};
     seen.fill(false);
     for (const auto &p : persons) {
@@ -502,6 +506,7 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
       if (idx == MAX_TARGETS) {
         idx = allocate_index_for_id(p.id);
       }
+      ESP_LOGI("SensyTwo", "Person ID: %u, Index: %zu", p.id, idx);
       publish_target(idx, p);
       target_last_seen_[idx] = frame_no_;
       seen[idx] = true;
