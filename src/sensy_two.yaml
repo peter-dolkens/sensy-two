@@ -113,6 +113,7 @@ sensy_two:
     id: t1_speed
     name: "Target 01 Speed"
     unit_of_measurement: "cm/s"
+    accuracy_decimals: 2
     icon: mdi:speedometer
   t1_distance_resolution:
     id: t1_distance_resolution
@@ -153,6 +154,7 @@ sensy_two:
     id: t2_speed
     name: "Target 02 Speed"
     unit_of_measurement: "cm/s"
+    accuracy_decimals: 2
     icon: mdi:speedometer
   t2_distance_resolution:
     id: t2_distance_resolution
@@ -193,6 +195,7 @@ sensy_two:
     id: t3_speed
     name: "Target 03 Speed"
     unit_of_measurement: "cm/s"
+    accuracy_decimals: 2
     icon: mdi:speedometer
   t3_distance_resolution:
     id: t3_distance_resolution
@@ -233,6 +236,7 @@ sensy_two:
     id: t4_speed
     name: "Target 04 Speed"
     unit_of_measurement: "cm/s"
+    accuracy_decimals: 2
     icon: mdi:speedometer
   t4_distance_resolution:
     id: t4_distance_resolution
@@ -273,6 +277,7 @@ sensy_two:
     id: t5_speed
     name: "Target 05 Speed"
     unit_of_measurement: "cm/s"
+    accuracy_decimals: 2
     icon: mdi:speedometer
   t5_distance_resolution:
     id: t5_distance_resolution
@@ -313,6 +318,7 @@ sensy_two:
     id: t6_speed
     name: "Target 06 Speed"
     unit_of_measurement: "cm/s"
+    accuracy_decimals: 2
     icon: mdi:speedometer
   t6_distance_resolution:
     id: t6_distance_resolution
@@ -353,6 +359,7 @@ sensy_two:
     id: t7_speed
     name: "Target 07 Speed"
     unit_of_measurement: "cm/s"
+    accuracy_decimals: 2
     icon: mdi:speedometer
   t7_distance_resolution:
     id: t7_distance_resolution
@@ -393,6 +400,7 @@ sensy_two:
     id: t8_speed
     name: "Target 08 Speed"
     unit_of_measurement: "cm/s"
+    accuracy_decimals: 2
     icon: mdi:speedometer
   t8_distance_resolution:
     id: t8_distance_resolution
@@ -433,6 +441,7 @@ sensy_two:
     id: t9_speed
     name: "Target 09 Speed"
     unit_of_measurement: "cm/s"
+    accuracy_decimals: 2
     icon: mdi:speedometer
   t9_distance_resolution:
     id: t9_distance_resolution
@@ -473,6 +482,7 @@ sensy_two:
     id: t10_speed
     name: "Target 10 Speed"
     unit_of_measurement: "cm/s"
+    accuracy_decimals: 2
     icon: mdi:speedometer
   t10_distance_resolution:
     id: t10_distance_resolution
@@ -713,7 +723,8 @@ button:
 sensor:
   - platform: template
     name: "Zone 1 Targets"
-    update_interval: 50000ms
+    update_interval: 100ms
+    accuracy_decimals: 0
     lambda: |-
       return id(sensy_component)->count_targets_in_zone(
         id(zone1_x_begin).state, id(zone1_x_end).state,
@@ -724,7 +735,8 @@ sensor:
 
   - platform: template
     name: "Zone 2 Targets"
-    update_interval: 50000ms
+    update_interval: 100ms
+    accuracy_decimals: 0
     lambda: |-
       return id(sensy_component)->count_targets_in_zone(
         id(zone2_x_begin).state, id(zone2_x_end).state,
@@ -735,7 +747,8 @@ sensor:
 
   - platform: template
     name: "Zone 3 Targets"
-    update_interval: 50000ms
+    update_interval: 100ms
+    accuracy_decimals: 0
     lambda: |-
       return id(sensy_component)->count_targets_in_zone(
         id(zone3_x_begin).state, id(zone3_x_end).state,
@@ -753,7 +766,6 @@ binary_sensor:
         id(zone1_y_begin).state, id(zone1_y_end).state,
         id(exclusion_x_begin).state, id(exclusion_x_end).state,
         id(exclusion_y_begin).state, id(exclusion_y_end).state) > 0;
-    update_interval: 50000ms
 
   - platform: template
     name: "Zone 2 Presence"
@@ -764,7 +776,6 @@ binary_sensor:
         id(zone2_y_begin).state, id(zone2_y_end).state,
         id(exclusion_x_begin).state, id(exclusion_x_end).state,
         id(exclusion_y_begin).state, id(exclusion_y_end).state) > 0;
-    update_interval: 50000ms
 
   - platform: template
     name: "Zone 3 Presence"
@@ -775,4 +786,3 @@ binary_sensor:
         id(zone3_y_begin).state, id(zone3_y_end).state,
         id(exclusion_x_begin).state, id(exclusion_x_end).state,
         id(exclusion_y_begin).state, id(exclusion_y_end).state) > 0;
-    update_interval: 50000ms
