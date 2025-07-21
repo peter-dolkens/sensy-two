@@ -49,3 +49,9 @@ angle, speed and distance. The example configuration also exposes number
 entities to configure up to three detection zones and an optional exclusion
 zone. Template sensors calculate zone presence, movement and target counts
 matching the Sensy-One reference implementation.
+
+### Orientation Settings
+
+Number entities can be used to rotate the reported coordinates around the X,
+Y and Z axes. Updating these values calls `set_rotation_x_deg`,
+`set_rotation_y_deg` and `set_rotation_z_deg` on the component.

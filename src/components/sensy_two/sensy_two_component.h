@@ -31,6 +31,10 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
     publish_interval_ms_ = interval_ms;
   }
 
+  void set_rotation_x_deg(float deg) { rotation_x_ = deg * M_PI / 180.0f; }
+  void set_rotation_y_deg(float deg) { rotation_y_ = deg * M_PI / 180.0f; }
+  void set_rotation_z_deg(float deg) { rotation_z_ = deg * M_PI / 180.0f; }
+
   void setup() override {
     // this->radar_debug(3);
     this->radar_restart();
@@ -245,6 +249,16 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
 
   float detection_range_threshold_ = 600.0f;
   uint32_t publish_interval_ms_ = 1000;
+  float rotation_x_ = 0.0f;
+  float rotation_y_ = 0.0f;
+  float rotation_z_ = 0.0f;
+
+  struct Person {
+    uint32_t id;
+    uint32_t q;
+    float x, y, z;
+    float vx, vy, vz;
+  } __attribute__((packed));
 
   struct TargetState {
     std::array<float, FIELDS> values{};
@@ -253,13 +267,7 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
   std::array<TargetState, MAX_TARGETS> current_state_{};
   std::array<TargetState, MAX_TARGETS> last_published_{};
   std::array<uint32_t, MAX_TARGETS> last_published_time_{};
-
-  struct Person {
-    uint32_t id;
-    uint32_t q;
-    float x, y, z;
-    float vx, vy, vz;
-  } __attribute__((packed));
+  std::array<Person, MAX_TARGETS> raw_targets_{};
 
   static constexpr uint32_t INVALID_ID = 0;
   std::array<uint32_t, MAX_TARGETS> target_ids_{};
@@ -354,9 +362,58 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
     return true;
   }
 
+  void apply_rotation(float &x, float &y, float &z) const {
+    // Rotate around X axis
+    float cosx = cosf(rotation_x_);
+    float sinx = sinf(rotation_x_);
+    float y1 = y * cosx - z * sinx;
+    float z1 = y * sinx + z * cosx;
+    float x1 = x;
+
+    // Rotate around Y axis
+    float cosy = cosf(rotation_y_);
+    float siny = sinf(rotation_y_);
+    float x2 = x1 * cosy + z1 * siny;
+    float z2 = -x1 * siny + z1 * cosy;
+    float y2 = y1;
+
+    // Rotate around Z axis
+    float cosz = cosf(rotation_z_);
+    float sinz = sinf(rotation_z_);
+    float x3 = x2 * cosz - y2 * sinz;
+    float y3 = x2 * sinz + y2 * cosz;
+
+    x = x3;
+    y = y3;
+    z = z2;
+  }
+
   void maybe_publish(size_t index) {
     uint32_t now = millis();
     if (now - last_published_time_[index] < publish_interval_ms_) return;
+    TargetState state;
+    if (target_ids_[index] != INVALID_ID) {
+      float x = raw_targets_[index].x;
+      float y = raw_targets_[index].y;
+      float z = raw_targets_[index].z;
+      float vx = raw_targets_[index].vx;
+      float vy = raw_targets_[index].vy;
+      float vz = raw_targets_[index].vz;
+      apply_rotation(x, y, z);
+      apply_rotation(vx, vy, vz);
+      float distance = sqrtf(x * x + y * y + z * z);
+      float angle = (distance > 0.0f) ? atan2f(x, y) * 180.0f / M_PI : 0.0f;
+      float speed = sqrtf(vx * vx + vy * vy + vz * vz);
+      if (distance > detection_range_threshold_) {
+        state.values = {0, 0, 0, 0, 0, 0, 0, 0};
+      } else {
+        state.values = {x * 100, y * 100, z * 100, angle, speed * 100, 0,
+                        distance * 100, raw_targets_[index].q * 1.0f};
+      }
+    } else {
+      state.values = {0, 0, 0, 0, 0, 0, 0, 0};
+    }
+    current_state_[index] = state;
     if (current_state_[index].values != last_published_[index].values) {
       last_published_time_[index] = now;
       last_published_[index] = current_state_[index];
@@ -448,22 +505,13 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
 
   void publish_target(size_t index, const Person &p) {
     if (index >= MAX_TARGETS) return;
-    float distance = sqrtf(p.x * p.x + p.y * p.y + p.z * p.z);
-    float angle = (distance > 0.0f) ? atan2f(p.x, p.y) * 180.0f / M_PI : 0.0f;
-    float speed = sqrtf(p.vx * p.vx + p.vy * p.vy + p.vz * p.vz);
-
-    TargetState state;
-    if (distance > detection_range_threshold_) {
-      state.values = {0, 0, 0, 0, 0, 0, 0, 0};
-    } else {
-      state.values = {p.x * 100, p.y * 100, p.z * 100, angle, speed * 100, 0, distance * 100, p.q * 1.0};
-    }
-    current_state_[index] = state;
+    raw_targets_[index] = p;
   }
 
   void clear_targets() {
     for (size_t i = 0; i < MAX_TARGETS; ++i) {
       current_state_[i].values = {0, 0, 0, 0, 0, 0, 0, 0};
+      raw_targets_[i] = {};
     }
   }
 
@@ -494,6 +542,37 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
   void publish_empty(size_t index) {
     if (index >= MAX_TARGETS) return;
     current_state_[index].values = {0, 0, 0, 0, 0, 0, 0, 0};
+    raw_targets_[index] = {};
+  }
+
+  int count_targets_in_zone(float x0, float x1, float y0, float y1,
+                            float ex_x0, float ex_x1, float ex_y0,
+                            float ex_y1) const {
+    auto in_rect = [](float x, float y, float rx0, float rx1, float ry0,
+                      float ry1) {
+      float x_min = std::min(rx0, rx1);
+      float x_max = std::max(rx0, rx1);
+      float y_min = std::min(ry0, ry1);
+      float y_max = std::max(ry0, ry1);
+      return x >= x_min && x <= x_max && y >= y_min && y <= y_max;
+    };
+    int count = 0;
+    for (size_t i = 0; i < MAX_TARGETS; ++i) {
+      if (target_ids_[i] == INVALID_ID) continue;
+      float x = raw_targets_[i].x;
+      float y = raw_targets_[i].y;
+      float z = raw_targets_[i].z;
+      apply_rotation(x, y, z);
+      float distance = sqrtf(x * x + y * y + z * z);
+      if (distance > detection_range_threshold_) continue;
+      float x_cm = x * 100.0f;
+      float y_cm = y * 100.0f;
+      if (in_rect(x_cm, y_cm, x0, x1, y0, y1) &&
+          !in_rect(x_cm, y_cm, ex_x0, ex_x1, ex_y0, ex_y1)) {
+        count++;
+      }
+    }
+    return count;
   }
 
   void assign_persons(const std::vector<Person> &persons) {

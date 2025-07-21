@@ -651,6 +651,42 @@ number:
       then:
         - lambda: 'id(sensy_component)->set_publish_interval_ms(id(publish_interval).state);'
 
+  - platform: template
+    id: rotation_x
+    name: "Rotation X"
+    min_value: -180
+    max_value: 180
+    step: 1
+    optimistic: true
+    restore_value: true
+    on_value:
+      then:
+        - lambda: 'id(sensy_component)->set_rotation_x_deg(id(rotation_x).state);'
+
+  - platform: template
+    id: rotation_y
+    name: "Rotation Y"
+    min_value: -180
+    max_value: 180
+    step: 1
+    optimistic: true
+    restore_value: true
+    on_value:
+      then:
+        - lambda: 'id(sensy_component)->set_rotation_y_deg(id(rotation_y).state);'
+
+  - platform: template
+    id: rotation_z
+    name: "Rotation Z"
+    min_value: -180
+    max_value: 180
+    step: 1
+    optimistic: true
+    restore_value: true
+    on_value:
+      then:
+        - lambda: 'id(sensy_component)->set_rotation_z_deg(id(rotation_z).state);'
+
 button:
   - platform: template
     name: "RADAR | Restart Module"
@@ -668,235 +704,61 @@ sensor:
     name: "Zone 1 Targets"
     update_interval: 50000ms
     lambda: |-
-      auto in_rect = [](float x,float y,float x0,float x1,float y0,float y1){
-        float x_min = std::min(x0,x1);
-        float x_max = std::max(x0,x1);
-        float y_min = std::min(y0,y1);
-        float y_max = std::max(y0,y1);
-        return x >= x_min && x <= x_max && y >= y_min && y <= y_max;
-      };
-      auto ex = in_rect;
-      float ex_x0=id(exclusion_x_begin).state;
-      float ex_x1=id(exclusion_x_end).state;
-      float ex_y0=id(exclusion_y_begin).state;
-      float ex_y1=id(exclusion_y_end).state;
-      int count=0;
-      if(in_rect(id(t1_x).state,id(t1_y).state,id(zone1_x_begin).state,id(zone1_x_end).state,id(zone1_y_begin).state,id(zone1_y_end).state)
-         && !ex(id(t1_x).state,id(t1_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
-      if(in_rect(id(t2_x).state,id(t2_y).state,id(zone1_x_begin).state,id(zone1_x_end).state,id(zone1_y_begin).state,id(zone1_y_end).state)
-         && !ex(id(t2_x).state,id(t2_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
-      if(in_rect(id(t3_x).state,id(t3_y).state,id(zone1_x_begin).state,id(zone1_x_end).state,id(zone1_y_begin).state,id(zone1_y_end).state)
-         && !ex(id(t3_x).state,id(t3_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
-      if(in_rect(id(t4_x).state,id(t4_y).state,id(zone1_x_begin).state,id(zone1_x_end).state,id(zone1_y_begin).state,id(zone1_y_end).state)
-         && !ex(id(t4_x).state,id(t4_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
-      if(in_rect(id(t5_x).state,id(t5_y).state,id(zone1_x_begin).state,id(zone1_x_end).state,id(zone1_y_begin).state,id(zone1_y_end).state)
-         && !ex(id(t5_x).state,id(t5_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
-      if(in_rect(id(t6_x).state,id(t6_y).state,id(zone1_x_begin).state,id(zone1_x_end).state,id(zone1_y_begin).state,id(zone1_y_end).state)
-         && !ex(id(t6_x).state,id(t6_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
-      if(in_rect(id(t7_x).state,id(t7_y).state,id(zone1_x_begin).state,id(zone1_x_end).state,id(zone1_y_begin).state,id(zone1_y_end).state)
-         && !ex(id(t7_x).state,id(t7_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
-      if(in_rect(id(t8_x).state,id(t8_y).state,id(zone1_x_begin).state,id(zone1_x_end).state,id(zone1_y_begin).state,id(zone1_y_end).state)
-         && !ex(id(t8_x).state,id(t8_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
-      if(in_rect(id(t9_x).state,id(t9_y).state,id(zone1_x_begin).state,id(zone1_x_end).state,id(zone1_y_begin).state,id(zone1_y_end).state)
-         && !ex(id(t9_x).state,id(t9_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
-      if(in_rect(id(t10_x).state,id(t10_y).state,id(zone1_x_begin).state,id(zone1_x_end).state,id(zone1_y_begin).state,id(zone1_y_end).state)
-         && !ex(id(t10_x).state,id(t10_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
-      return count;
+      return id(sensy_component)->count_targets_in_zone(
+        id(zone1_x_begin).state, id(zone1_x_end).state,
+        id(zone1_y_begin).state, id(zone1_y_end).state,
+        id(exclusion_x_begin).state, id(exclusion_x_end).state,
+        id(exclusion_y_begin).state, id(exclusion_y_end).state);
 
   - platform: template
     name: "Zone 1 Presence"
     update_interval: 50000ms
     lambda: |-
-      auto in_rect = [](float x,float y,float x0,float x1,float y0,float y1){
-        float x_min = std::min(x0,x1);
-        float x_max = std::max(x0,x1);
-        float y_min = std::min(y0,y1);
-        float y_max = std::max(y0,y1);
-        return x >= x_min && x <= x_max && y >= y_min && y <= y_max;
-      };
-      auto ex = in_rect;
-      float ex_x0=id(exclusion_x_begin).state;
-      float ex_x1=id(exclusion_x_end).state;
-      float ex_y0=id(exclusion_y_begin).state;
-      float ex_y1=id(exclusion_y_end).state;
-      bool det=false;
-      if(in_rect(id(t1_x).state,id(t1_y).state,id(zone1_x_begin).state,id(zone1_x_end).state,id(zone1_y_begin).state,id(zone1_y_end).state)
-         && !ex(id(t1_x).state,id(t1_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
-      if(in_rect(id(t2_x).state,id(t2_y).state,id(zone1_x_begin).state,id(zone1_x_end).state,id(zone1_y_begin).state,id(zone1_y_end).state)
-         && !ex(id(t2_x).state,id(t2_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
-      if(in_rect(id(t3_x).state,id(t3_y).state,id(zone1_x_begin).state,id(zone1_x_end).state,id(zone1_y_begin).state,id(zone1_y_end).state)
-         && !ex(id(t3_x).state,id(t3_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
-      if(in_rect(id(t4_x).state,id(t4_y).state,id(zone1_x_begin).state,id(zone1_x_end).state,id(zone1_y_begin).state,id(zone1_y_end).state)
-         && !ex(id(t4_x).state,id(t4_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
-      if(in_rect(id(t5_x).state,id(t5_y).state,id(zone1_x_begin).state,id(zone1_x_end).state,id(zone1_y_begin).state,id(zone1_y_end).state)
-         && !ex(id(t5_x).state,id(t5_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
-      if(in_rect(id(t6_x).state,id(t6_y).state,id(zone1_x_begin).state,id(zone1_x_end).state,id(zone1_y_begin).state,id(zone1_y_end).state)
-         && !ex(id(t6_x).state,id(t6_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
-      if(in_rect(id(t7_x).state,id(t7_y).state,id(zone1_x_begin).state,id(zone1_x_end).state,id(zone1_y_begin).state,id(zone1_y_end).state)
-         && !ex(id(t7_x).state,id(t7_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
-      if(in_rect(id(t8_x).state,id(t8_y).state,id(zone1_x_begin).state,id(zone1_x_end).state,id(zone1_y_begin).state,id(zone1_y_end).state)
-         && !ex(id(t8_x).state,id(t8_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
-      if(in_rect(id(t9_x).state,id(t9_y).state,id(zone1_x_begin).state,id(zone1_x_end).state,id(zone1_y_begin).state,id(zone1_y_end).state)
-         && !ex(id(t9_x).state,id(t9_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
-      if(in_rect(id(t10_x).state,id(t10_y).state,id(zone1_x_begin).state,id(zone1_x_end).state,id(zone1_y_begin).state,id(zone1_y_end).state)
-         && !ex(id(t10_x).state,id(t10_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
-      return det;
+      return id(sensy_component)->count_targets_in_zone(
+        id(zone1_x_begin).state, id(zone1_x_end).state,
+        id(zone1_y_begin).state, id(zone1_y_end).state,
+        id(exclusion_x_begin).state, id(exclusion_x_end).state,
+        id(exclusion_y_begin).state, id(exclusion_y_end).state) > 0;
 
   - platform: template
     name: "Zone 2 Targets"
     update_interval: 50000ms
     lambda: |-
-      auto in_rect = [](float x,float y,float x0,float x1,float y0,float y1){
-        float x_min = std::min(x0,x1);
-        float x_max = std::max(x0,x1);
-        float y_min = std::min(y0,y1);
-        float y_max = std::max(y0,y1);
-        return x >= x_min && x <= x_max && y >= y_min && y <= y_max;
-      };
-      auto ex = in_rect;
-      float ex_x0=id(exclusion_x_begin).state;
-      float ex_x1=id(exclusion_x_end).state;
-      float ex_y0=id(exclusion_y_begin).state;
-      float ex_y1=id(exclusion_y_end).state;
-      int count=0;
-      if(in_rect(id(t1_x).state,id(t1_y).state,id(zone2_x_begin).state,id(zone2_x_end).state,id(zone2_y_begin).state,id(zone2_y_end).state)
-         && !ex(id(t1_x).state,id(t1_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
-      if(in_rect(id(t2_x).state,id(t2_y).state,id(zone2_x_begin).state,id(zone2_x_end).state,id(zone2_y_begin).state,id(zone2_y_end).state)
-         && !ex(id(t2_x).state,id(t2_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
-      if(in_rect(id(t3_x).state,id(t3_y).state,id(zone2_x_begin).state,id(zone2_x_end).state,id(zone2_y_begin).state,id(zone2_y_end).state)
-         && !ex(id(t3_x).state,id(t3_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
-      if(in_rect(id(t4_x).state,id(t4_y).state,id(zone2_x_begin).state,id(zone2_x_end).state,id(zone2_y_begin).state,id(zone2_y_end).state)
-         && !ex(id(t4_x).state,id(t4_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
-      if(in_rect(id(t5_x).state,id(t5_y).state,id(zone2_x_begin).state,id(zone2_x_end).state,id(zone2_y_begin).state,id(zone2_y_end).state)
-         && !ex(id(t5_x).state,id(t5_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
-      if(in_rect(id(t6_x).state,id(t6_y).state,id(zone2_x_begin).state,id(zone2_x_end).state,id(zone2_y_begin).state,id(zone2_y_end).state)
-         && !ex(id(t6_x).state,id(t6_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
-      if(in_rect(id(t7_x).state,id(t7_y).state,id(zone2_x_begin).state,id(zone2_x_end).state,id(zone2_y_begin).state,id(zone2_y_end).state)
-         && !ex(id(t7_x).state,id(t7_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
-      if(in_rect(id(t8_x).state,id(t8_y).state,id(zone2_x_begin).state,id(zone2_x_end).state,id(zone2_y_begin).state,id(zone2_y_end).state)
-         && !ex(id(t8_x).state,id(t8_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
-      if(in_rect(id(t9_x).state,id(t9_y).state,id(zone2_x_begin).state,id(zone2_x_end).state,id(zone2_y_begin).state,id(zone2_y_end).state)
-         && !ex(id(t9_x).state,id(t9_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
-      if(in_rect(id(t10_x).state,id(t10_y).state,id(zone2_x_begin).state,id(zone2_x_end).state,id(zone2_y_begin).state,id(zone2_y_end).state)
-         && !ex(id(t10_x).state,id(t10_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
-      return count;
+      return id(sensy_component)->count_targets_in_zone(
+        id(zone2_x_begin).state, id(zone2_x_end).state,
+        id(zone2_y_begin).state, id(zone2_y_end).state,
+        id(exclusion_x_begin).state, id(exclusion_x_end).state,
+        id(exclusion_y_begin).state, id(exclusion_y_end).state);
 
   - platform: template
     name: "Zone 2 Presence"
     update_interval: 50000ms
     lambda: |-
-      auto in_rect = [](float x,float y,float x0,float x1,float y0,float y1){
-        float x_min = std::min(x0,x1);
-        float x_max = std::max(x0,x1);
-        float y_min = std::min(y0,y1);
-        float y_max = std::max(y0,y1);
-        return x >= x_min && x <= x_max && y >= y_min && y <= y_max;
-      };
-      auto ex = in_rect;
-      float ex_x0=id(exclusion_x_begin).state;
-      float ex_x1=id(exclusion_x_end).state;
-      float ex_y0=id(exclusion_y_begin).state;
-      float ex_y1=id(exclusion_y_end).state;
-      bool det=false;
-      if(in_rect(id(t1_x).state,id(t1_y).state,id(zone2_x_begin).state,id(zone2_x_end).state,id(zone2_y_begin).state,id(zone2_y_end).state)
-         && !ex(id(t1_x).state,id(t1_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
-      if(in_rect(id(t2_x).state,id(t2_y).state,id(zone2_x_begin).state,id(zone2_x_end).state,id(zone2_y_begin).state,id(zone2_y_end).state)
-         && !ex(id(t2_x).state,id(t2_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
-      if(in_rect(id(t3_x).state,id(t3_y).state,id(zone2_x_begin).state,id(zone2_x_end).state,id(zone2_y_begin).state,id(zone2_y_end).state)
-         && !ex(id(t3_x).state,id(t3_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
-      if(in_rect(id(t4_x).state,id(t4_y).state,id(zone2_x_begin).state,id(zone2_x_end).state,id(zone2_y_begin).state,id(zone2_y_end).state)
-         && !ex(id(t4_x).state,id(t4_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
-      if(in_rect(id(t5_x).state,id(t5_y).state,id(zone2_x_begin).state,id(zone2_x_end).state,id(zone2_y_begin).state,id(zone2_y_end).state)
-         && !ex(id(t5_x).state,id(t5_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
-      if(in_rect(id(t6_x).state,id(t6_y).state,id(zone2_x_begin).state,id(zone2_x_end).state,id(zone2_y_begin).state,id(zone2_y_end).state)
-         && !ex(id(t6_x).state,id(t6_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
-      if(in_rect(id(t7_x).state,id(t7_y).state,id(zone2_x_begin).state,id(zone2_x_end).state,id(zone2_y_begin).state,id(zone2_y_end).state)
-         && !ex(id(t7_x).state,id(t7_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
-      if(in_rect(id(t8_x).state,id(t8_y).state,id(zone2_x_begin).state,id(zone2_x_end).state,id(zone2_y_begin).state,id(zone2_y_end).state)
-         && !ex(id(t8_x).state,id(t8_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
-      if(in_rect(id(t9_x).state,id(t9_y).state,id(zone2_x_begin).state,id(zone2_x_end).state,id(zone2_y_begin).state,id(zone2_y_end).state)
-         && !ex(id(t9_x).state,id(t9_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
-      if(in_rect(id(t10_x).state,id(t10_y).state,id(zone2_x_begin).state,id(zone2_x_end).state,id(zone2_y_begin).state,id(zone2_y_end).state)
-         && !ex(id(t10_x).state,id(t10_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
-      return det;
+      return id(sensy_component)->count_targets_in_zone(
+        id(zone2_x_begin).state, id(zone2_x_end).state,
+        id(zone2_y_begin).state, id(zone2_y_end).state,
+        id(exclusion_x_begin).state, id(exclusion_x_end).state,
+        id(exclusion_y_begin).state, id(exclusion_y_end).state) > 0;
 
   - platform: template
     name: "Zone 3 Targets"
     update_interval: 50000ms
     lambda: |-
-      auto in_rect = [](float x,float y,float x0,float x1,float y0,float y1){
-        float x_min = std::min(x0,x1);
-        float x_max = std::max(x0,x1);
-        float y_min = std::min(y0,y1);
-        float y_max = std::max(y0,y1);
-        return x >= x_min && x <= x_max && y >= y_min && y <= y_max;
-      };
-      auto ex = in_rect;
-      float ex_x0=id(exclusion_x_begin).state;
-      float ex_x1=id(exclusion_x_end).state;
-      float ex_y0=id(exclusion_y_begin).state;
-      float ex_y1=id(exclusion_y_end).state;
-      int count=0;
-      if(in_rect(id(t1_x).state,id(t1_y).state,id(zone3_x_begin).state,id(zone3_x_end).state,id(zone3_y_begin).state,id(zone3_y_end).state)
-         && !ex(id(t1_x).state,id(t1_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
-      if(in_rect(id(t2_x).state,id(t2_y).state,id(zone3_x_begin).state,id(zone3_x_end).state,id(zone3_y_begin).state,id(zone3_y_end).state)
-         && !ex(id(t2_x).state,id(t2_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
-      if(in_rect(id(t3_x).state,id(t3_y).state,id(zone3_x_begin).state,id(zone3_x_end).state,id(zone3_y_begin).state,id(zone3_y_end).state)
-         && !ex(id(t3_x).state,id(t3_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
-      if(in_rect(id(t4_x).state,id(t4_y).state,id(zone3_x_begin).state,id(zone3_x_end).state,id(zone3_y_begin).state,id(zone3_y_end).state)
-         && !ex(id(t4_x).state,id(t4_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
-      if(in_rect(id(t5_x).state,id(t5_y).state,id(zone3_x_begin).state,id(zone3_x_end).state,id(zone3_y_begin).state,id(zone3_y_end).state)
-         && !ex(id(t5_x).state,id(t5_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
-      if(in_rect(id(t6_x).state,id(t6_y).state,id(zone3_x_begin).state,id(zone3_x_end).state,id(zone3_y_begin).state,id(zone3_y_end).state)
-         && !ex(id(t6_x).state,id(t6_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
-      if(in_rect(id(t7_x).state,id(t7_y).state,id(zone3_x_begin).state,id(zone3_x_end).state,id(zone3_y_begin).state,id(zone3_y_end).state)
-         && !ex(id(t7_x).state,id(t7_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
-      if(in_rect(id(t8_x).state,id(t8_y).state,id(zone3_x_begin).state,id(zone3_x_end).state,id(zone3_y_begin).state,id(zone3_y_end).state)
-         && !ex(id(t8_x).state,id(t8_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
-      if(in_rect(id(t9_x).state,id(t9_y).state,id(zone3_x_begin).state,id(zone3_x_end).state,id(zone3_y_begin).state,id(zone3_y_end).state)
-         && !ex(id(t9_x).state,id(t9_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
-      if(in_rect(id(t10_x).state,id(t10_y).state,id(zone3_x_begin).state,id(zone3_x_end).state,id(zone3_y_begin).state,id(zone3_y_end).state)
-         && !ex(id(t10_x).state,id(t10_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) count++;
-      return count;
+      return id(sensy_component)->count_targets_in_zone(
+        id(zone3_x_begin).state, id(zone3_x_end).state,
+        id(zone3_y_begin).state, id(zone3_y_end).state,
+        id(exclusion_x_begin).state, id(exclusion_x_end).state,
+        id(exclusion_y_begin).state, id(exclusion_y_end).state);
 
   - platform: template
     name: "Zone 3 Presence"
     update_interval: 50000ms
     lambda: |-
-      auto in_rect = [](float x,float y,float x0,float x1,float y0,float y1){
-        float x_min = std::min(x0,x1);
-        float x_max = std::max(x0,x1);
-        float y_min = std::min(y0,y1);
-        float y_max = std::max(y0,y1);
-        return x >= x_min && x <= x_max && y >= y_min && y <= y_max;
-      };
-      auto ex = in_rect;
-      float ex_x0=id(exclusion_x_begin).state;
-      float ex_x1=id(exclusion_x_end).state;
-      float ex_y0=id(exclusion_y_begin).state;
-      float ex_y1=id(exclusion_y_end).state;
-      bool det=false;
-      if(in_rect(id(t1_x).state,id(t1_y).state,id(zone3_x_begin).state,id(zone3_x_end).state,id(zone3_y_begin).state,id(zone3_y_end).state)
-         && !ex(id(t1_x).state,id(t1_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
-      if(in_rect(id(t2_x).state,id(t2_y).state,id(zone3_x_begin).state,id(zone3_x_end).state,id(zone3_y_begin).state,id(zone3_y_end).state)
-         && !ex(id(t2_x).state,id(t2_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
-      if(in_rect(id(t3_x).state,id(t3_y).state,id(zone3_x_begin).state,id(zone3_x_end).state,id(zone3_y_begin).state,id(zone3_y_end).state)
-         && !ex(id(t3_x).state,id(t3_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
-      if(in_rect(id(t4_x).state,id(t4_y).state,id(zone3_x_begin).state,id(zone3_x_end).state,id(zone3_y_begin).state,id(zone3_y_end).state)
-         && !ex(id(t4_x).state,id(t4_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
-      if(in_rect(id(t5_x).state,id(t5_y).state,id(zone3_x_begin).state,id(zone3_x_end).state,id(zone3_y_begin).state,id(zone3_y_end).state)
-         && !ex(id(t5_x).state,id(t5_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
-      if(in_rect(id(t6_x).state,id(t6_y).state,id(zone3_x_begin).state,id(zone3_x_end).state,id(zone3_y_begin).state,id(zone3_y_end).state)
-         && !ex(id(t6_x).state,id(t6_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
-      if(in_rect(id(t7_x).state,id(t7_y).state,id(zone3_x_begin).state,id(zone3_x_end).state,id(zone3_y_begin).state,id(zone3_y_end).state)
-         && !ex(id(t7_x).state,id(t7_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
-      if(in_rect(id(t8_x).state,id(t8_y).state,id(zone3_x_begin).state,id(zone3_x_end).state,id(zone3_y_begin).state,id(zone3_y_end).state)
-         && !ex(id(t8_x).state,id(t8_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
-      if(in_rect(id(t9_x).state,id(t9_y).state,id(zone3_x_begin).state,id(zone3_x_end).state,id(zone3_y_begin).state,id(zone3_y_end).state)
-         && !ex(id(t9_x).state,id(t9_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
-      if(in_rect(id(t10_x).state,id(t10_y).state,id(zone3_x_begin).state,id(zone3_x_end).state,id(zone3_y_begin).state,id(zone3_y_end).state)
-         && !ex(id(t10_x).state,id(t10_y).state,ex_x0,ex_x1,ex_y0,ex_y1)) det=true;
-      return det;
+      return id(sensy_component)->count_targets_in_zone(
+        id(zone3_x_begin).state, id(zone3_x_end).state,
+        id(zone3_y_begin).state, id(zone3_y_end).state,
+        id(exclusion_x_begin).state, id(exclusion_x_end).state,
+        id(exclusion_y_begin).state, id(exclusion_y_end).state) > 0;
 
 
 
