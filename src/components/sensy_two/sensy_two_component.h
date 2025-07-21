@@ -11,12 +11,15 @@
 #include <cstring>
 #include <cmath>
 #include <vector>
+#include <array>
 
 namespace esphome {
 namespace sensytwo {
 
 class SensyTwoComponent : public Component, public uart::UARTDevice {
  public:
+  static const size_t MAX_TARGETS = 10;
+  static const size_t FIELDS = 7;
   explicit SensyTwoComponent(uart::UARTComponent *parent)
       : uart::UARTDevice(parent) {}
 
@@ -83,9 +86,18 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
   }
 
   std::vector<sensor::Sensor *> get_target_sensors() {
-    return {t1_x, t1_y, t1_z, t1_angle, t1_speed, t1_distance_resolution, t1_distance,
-            t2_x, t2_y, t2_z, t2_angle, t2_speed, t2_distance_resolution, t2_distance,
-            t3_x, t3_y, t3_z, t3_angle, t3_speed, t3_distance_resolution, t3_distance};
+    std::vector<sensor::Sensor *> sensors;
+    sensors.reserve(MAX_TARGETS * FIELDS);
+    for (size_t i = 0; i < MAX_TARGETS; ++i) {
+      sensors.push_back(x_sensors_[i]);
+      sensors.push_back(y_sensors_[i]);
+      sensors.push_back(z_sensors_[i]);
+      sensors.push_back(angle_sensors_[i]);
+      sensors.push_back(speed_sensors_[i]);
+      sensors.push_back(distance_resolution_sensors_[i]);
+      sensors.push_back(distance_sensors_[i]);
+    }
+    return sensors;
   }
 
   std::vector<sensor::Sensor *> get_all_sensors() { return get_target_sensors(); }
@@ -124,8 +136,72 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
   sensor::Sensor *t3_distance_resolution = new sensor::Sensor();
   sensor::Sensor *t3_distance = new sensor::Sensor();
 
+  sensor::Sensor *t4_x = new sensor::Sensor();
+  sensor::Sensor *t4_y = new sensor::Sensor();
+  sensor::Sensor *t4_z = new sensor::Sensor();
+  sensor::Sensor *t4_angle = new sensor::Sensor();
+  sensor::Sensor *t4_speed = new sensor::Sensor();
+  sensor::Sensor *t4_distance_resolution = new sensor::Sensor();
+  sensor::Sensor *t4_distance = new sensor::Sensor();
+
+  sensor::Sensor *t5_x = new sensor::Sensor();
+  sensor::Sensor *t5_y = new sensor::Sensor();
+  sensor::Sensor *t5_z = new sensor::Sensor();
+  sensor::Sensor *t5_angle = new sensor::Sensor();
+  sensor::Sensor *t5_speed = new sensor::Sensor();
+  sensor::Sensor *t5_distance_resolution = new sensor::Sensor();
+  sensor::Sensor *t5_distance = new sensor::Sensor();
+
+  sensor::Sensor *t6_x = new sensor::Sensor();
+  sensor::Sensor *t6_y = new sensor::Sensor();
+  sensor::Sensor *t6_z = new sensor::Sensor();
+  sensor::Sensor *t6_angle = new sensor::Sensor();
+  sensor::Sensor *t6_speed = new sensor::Sensor();
+  sensor::Sensor *t6_distance_resolution = new sensor::Sensor();
+  sensor::Sensor *t6_distance = new sensor::Sensor();
+
+  sensor::Sensor *t7_x = new sensor::Sensor();
+  sensor::Sensor *t7_y = new sensor::Sensor();
+  sensor::Sensor *t7_z = new sensor::Sensor();
+  sensor::Sensor *t7_angle = new sensor::Sensor();
+  sensor::Sensor *t7_speed = new sensor::Sensor();
+  sensor::Sensor *t7_distance_resolution = new sensor::Sensor();
+  sensor::Sensor *t7_distance = new sensor::Sensor();
+
+  sensor::Sensor *t8_x = new sensor::Sensor();
+  sensor::Sensor *t8_y = new sensor::Sensor();
+  sensor::Sensor *t8_z = new sensor::Sensor();
+  sensor::Sensor *t8_angle = new sensor::Sensor();
+  sensor::Sensor *t8_speed = new sensor::Sensor();
+  sensor::Sensor *t8_distance_resolution = new sensor::Sensor();
+  sensor::Sensor *t8_distance = new sensor::Sensor();
+
+  sensor::Sensor *t9_x = new sensor::Sensor();
+  sensor::Sensor *t9_y = new sensor::Sensor();
+  sensor::Sensor *t9_z = new sensor::Sensor();
+  sensor::Sensor *t9_angle = new sensor::Sensor();
+  sensor::Sensor *t9_speed = new sensor::Sensor();
+  sensor::Sensor *t9_distance_resolution = new sensor::Sensor();
+  sensor::Sensor *t9_distance = new sensor::Sensor();
+
+  sensor::Sensor *t10_x = new sensor::Sensor();
+  sensor::Sensor *t10_y = new sensor::Sensor();
+  sensor::Sensor *t10_z = new sensor::Sensor();
+  sensor::Sensor *t10_angle = new sensor::Sensor();
+  sensor::Sensor *t10_speed = new sensor::Sensor();
+  sensor::Sensor *t10_distance_resolution = new sensor::Sensor();
+  sensor::Sensor *t10_distance = new sensor::Sensor();
+
   text_sensor::TextSensor *radar_firmware = new text_sensor::TextSensor();
   text_sensor::TextSensor *radar_mac = new text_sensor::TextSensor();
+
+  std::array<sensor::Sensor *, MAX_TARGETS> x_sensors_{t1_x, t2_x, t3_x, t4_x, t5_x, t6_x, t7_x, t8_x, t9_x, t10_x};
+  std::array<sensor::Sensor *, MAX_TARGETS> y_sensors_{t1_y, t2_y, t3_y, t4_y, t5_y, t6_y, t7_y, t8_y, t9_y, t10_y};
+  std::array<sensor::Sensor *, MAX_TARGETS> z_sensors_{t1_z, t2_z, t3_z, t4_z, t5_z, t6_z, t7_z, t8_z, t9_z, t10_z};
+  std::array<sensor::Sensor *, MAX_TARGETS> angle_sensors_{t1_angle, t2_angle, t3_angle, t4_angle, t5_angle, t6_angle, t7_angle, t8_angle, t9_angle, t10_angle};
+  std::array<sensor::Sensor *, MAX_TARGETS> speed_sensors_{t1_speed, t2_speed, t3_speed, t4_speed, t5_speed, t6_speed, t7_speed, t8_speed, t9_speed, t10_speed};
+  std::array<sensor::Sensor *, MAX_TARGETS> distance_resolution_sensors_{t1_distance_resolution, t2_distance_resolution, t3_distance_resolution, t4_distance_resolution, t5_distance_resolution, t6_distance_resolution, t7_distance_resolution, t8_distance_resolution, t9_distance_resolution, t10_distance_resolution};
+  std::array<sensor::Sensor *, MAX_TARGETS> distance_sensors_{t1_distance, t2_distance, t3_distance, t4_distance, t5_distance, t6_distance, t7_distance, t8_distance, t9_distance, t10_distance};
 
  protected:
   static const uint8_t HEADER[8];
@@ -331,89 +407,38 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
   }
 
   void publish_target(size_t index, const Person &p) {
+    if (index >= MAX_TARGETS) return;
     float distance = sqrtf(p.x * p.x + p.y * p.y + p.z * p.z);
     float angle = (distance > 0.0f) ? atan2f(p.x, p.y) * 180.0f / M_PI : 0.0f;
     float speed = sqrtf(p.vx * p.vx + p.vy * p.vy + p.vz * p.vz);
 
-    if (distance > detection_range_threshold_) {
-      if (index == 0) {
-        t1_x->publish_state(0);
-        t1_y->publish_state(0);
-        t1_z->publish_state(0);
-        t1_angle->publish_state(0);
-        t1_speed->publish_state(0);
-        t1_distance_resolution->publish_state(0);
-        t1_distance->publish_state(0);
-      } else if (index == 1) {
-        t2_x->publish_state(0);
-        t2_y->publish_state(0);
-        t2_z->publish_state(0);
-        t2_angle->publish_state(0);
-        t2_speed->publish_state(0);
-        t2_distance_resolution->publish_state(0);
-        t2_distance->publish_state(0);
-      } else if (index == 2) {
-        t3_x->publish_state(0);
-        t3_y->publish_state(0);
-        t3_z->publish_state(0);
-        t3_angle->publish_state(0);
-        t3_speed->publish_state(0);
-        t3_distance_resolution->publish_state(0);
-        t3_distance->publish_state(0);
-      }
-      return;
-    }
+    auto publish = [&](float x, float y, float z, float ang, float spd, float dist) {
+      x_sensors_[index]->publish_state(x);
+      y_sensors_[index]->publish_state(y);
+      z_sensors_[index]->publish_state(z);
+      angle_sensors_[index]->publish_state(ang);
+      speed_sensors_[index]->publish_state(spd);
+      distance_resolution_sensors_[index]->publish_state(0);
+      distance_sensors_[index]->publish_state(dist);
+    };
 
-    if (index == 0) {
-      t1_x->publish_state(p.x);
-      t1_y->publish_state(p.y);
-      t1_z->publish_state(p.z);
-      t1_angle->publish_state(angle);
-      t1_speed->publish_state(speed);
-      t1_distance_resolution->publish_state(0);
-      t1_distance->publish_state(distance);
-    } else if (index == 1) {
-      t2_x->publish_state(p.x);
-      t2_y->publish_state(p.y);
-      t2_z->publish_state(p.z);
-      t2_angle->publish_state(angle);
-      t2_speed->publish_state(speed);
-      t2_distance_resolution->publish_state(0);
-      t2_distance->publish_state(distance);
-    } else if (index == 2) {
-      t3_x->publish_state(p.x);
-      t3_y->publish_state(p.y);
-      t3_z->publish_state(p.z);
-      t3_angle->publish_state(angle);
-      t3_speed->publish_state(speed);
-      t3_distance_resolution->publish_state(0);
-      t3_distance->publish_state(distance);
+    if (distance > detection_range_threshold_) {
+      publish(0, 0, 0, 0, 0, 0);
+    } else {
+      publish(p.x, p.y, p.z, angle, speed, distance);
     }
   }
 
   void clear_targets() {
-    return;
-    t1_x->publish_state(0);
-    t1_y->publish_state(0);
-    t1_z->publish_state(0);
-    t1_angle->publish_state(0);
-    t1_speed->publish_state(0);
-    t1_distance_resolution->publish_state(0);
-    t1_distance->publish_state(0);
-    t2_x->publish_state(0);
-    t2_y->publish_state(0);
-    t2_z->publish_state(0);
-    t2_angle->publish_state(0);
-    t2_speed->publish_state(0);
-    t2_distance_resolution->publish_state(0);
-    t2_distance->publish_state(0);
-    t3_x->publish_state(0);
-    t3_y->publish_state(0);
-    t3_z->publish_state(0);
-    t3_angle->publish_state(0);
-    t3_speed->publish_state(0);
-    t3_distance_resolution->publish_state(0);
-    t3_distance->publish_state(0);
+    for (size_t i = 0; i < MAX_TARGETS; ++i) {
+      x_sensors_[i]->publish_state(0);
+      y_sensors_[i]->publish_state(0);
+      z_sensors_[i]->publish_state(0);
+      angle_sensors_[i]->publish_state(0);
+      speed_sensors_[i]->publish_state(0);
+      distance_resolution_sensors_[i]->publish_state(0);
+      distance_sensors_[i]->publish_state(0);
+    }
   }
 };
 
