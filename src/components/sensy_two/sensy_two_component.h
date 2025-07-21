@@ -40,13 +40,34 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
     this->radar_sensitivity(value);
   }
 
+  void set_report_interval_ms(int value) {
+    report_interval_ms_ = value;
+    this->radar_report_interval(value);
+  }
+
+  void set_monitor_interval_s(int value) {
+    monitor_interval_s_ = value;
+    this->radar_monitor_interval(value);
+  }
+
+  void set_heartbeat_interval_s(int value) {
+    heartbeat_interval_s_ = value;
+    this->radar_heartbeat_timeout(value);
+  }
+
+  void set_range_cm(int value) {
+    range_cm_ = value;
+    this->radar_range(value);
+  }
+
   void setup() override {
     // this->radar_debug(3);
     this->radar_restart();
     this->radar_start();
-    this->radar_report_interval(200);
-    this->radar_monitor_interval(1);
-    this->radar_heartbeat_timeout(10);
+    this->radar_report_interval(report_interval_ms_);
+    this->radar_monitor_interval(monitor_interval_s_);
+    this->radar_heartbeat_timeout(heartbeat_interval_s_);
+    this->radar_range(range_cm_);
     this->radar_sensitivity(sensitivity_);
     this->radar_seeking();
     this->radar_capture();
@@ -82,6 +103,12 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
   void radar_heartbeat_timeout(int value) {
     char cmd[32];
     snprintf(cmd, sizeof(cmd), "AT+HEATIME=%d\n", value);
+    this->write_str(cmd);
+    delay(100);
+  }
+  void radar_range(int value) {
+    char cmd[32];
+    snprintf(cmd, sizeof(cmd), "AT+RANGE=%d\n", value);
     this->write_str(cmd);
     delay(100);
   }
@@ -258,6 +285,10 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
   float rotation_y_ = 0.0f;
   float rotation_z_ = 0.0f;
   int sensitivity_ = 2;
+  int report_interval_ms_ = 200;
+  int monitor_interval_s_ = 1;
+  int heartbeat_interval_s_ = 10;
+  int range_cm_ = 600;
 
   struct Person {
     uint32_t id;
