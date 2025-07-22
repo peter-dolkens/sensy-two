@@ -33,15 +33,7 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
   void set_rotation_z_deg(float deg) { rotation_z_ = deg * M_PI / 180.0f; }
 
   void setup() override {
-    this->radar_restart();
-    this->radar_start();
-    this->radar_report_interval(report_interval_ms_);
-    this->radar_monitor_interval(monitor_interval_s_);
-    this->radar_heartbeat_timeout(heartbeat_interval_s_);
-    this->radar_range(range_cm_);
-    this->radar_sensitivity(sensitivity_);
-    this->radar_seeking();
-    this->radar_capture();
+    this->apply_settings();
 
     if (this->radar_firmware)
       this->radar_firmware->publish_state("unknown");
@@ -98,8 +90,28 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
   void radar_restart() { this->write_str("AT+RESET\n"); delay(100); }
   void radar_capture() { this->write_str("AT+SETTING\n"); delay(100); }
 
+  void apply_settings() {
+    this->radar_restart();
+    this->radar_start();
+    this->radar_report_interval(report_interval_ms_);
+    this->radar_monitor_interval(monitor_interval_s_);
+    this->radar_heartbeat_timeout(heartbeat_interval_s_);
+    this->radar_range(range_cm_);
+    this->radar_sensitivity(sensitivity_);
+    this->radar_seeking();
+    this->radar_capture();
+    last_frame_ms_ = millis();
+  }
+
   void loop() override {
     parse_ring();
+    uint32_t now = millis();
+    if (now - last_frame_ms_ > frame_timeout_ms_) {
+      if (now - last_reinit_ms_ > frame_timeout_ms_) {
+        apply_settings();
+        last_reinit_ms_ = now;
+      }
+    }
     yield();  // Allow other tasks to run
     delay(10);  // Allow some time for UART processing
     for (size_t i = 0; i < MAX_TARGETS; ++i) {
@@ -253,6 +265,9 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
   int monitor_interval_s_ = 1;
   int heartbeat_interval_s_ = 10;
   int range_cm_ = 600;
+  uint32_t last_frame_ms_ = 0;
+  uint32_t last_reinit_ms_ = 0;
+  uint32_t frame_timeout_ms_ = 2000;
 
   struct Person {
     uint32_t id;
@@ -643,6 +658,7 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
  protected:
   void assign_persons(const std::vector<Person> &persons) {
     ESP_LOGI("SensyTwo", "Assigning %zu persons", persons.size());
+    last_frame_ms_ = millis();
     std::array<bool, MAX_TARGETS> seen{};
     seen.fill(false);
     for (const auto &p : persons) {
