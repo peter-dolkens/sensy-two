@@ -551,6 +551,18 @@ number:
     restore_value: true
 
   - platform: template
+    id: zone1_movement_threshold
+    name: "Zone 1 Movement Threshold"
+    unit_of_measurement: "cm/s"
+    min_value: 0
+    max_value: 1000
+    step: 1
+    optimistic: true
+    restore_value: true
+    initial_value: 0
+    entity_category: config
+
+  - platform: template
     id: zone2_x_begin
     name: "Zone 2 X Begin"
     icon: mdi:arrow-collapse-left
@@ -592,6 +604,18 @@ number:
     restore_value: true
 
   - platform: template
+    id: zone2_movement_threshold
+    name: "Zone 2 Movement Threshold"
+    unit_of_measurement: "cm/s"
+    min_value: 0
+    max_value: 1000
+    step: 1
+    optimistic: true
+    restore_value: true
+    initial_value: 0
+    entity_category: config
+
+  - platform: template
     id: zone3_x_begin
     name: "Zone 3 X Begin"
     icon: mdi:arrow-collapse-left
@@ -631,6 +655,18 @@ number:
     step: 1
     optimistic: true
     restore_value: true
+
+  - platform: template
+    id: zone3_movement_threshold
+    name: "Zone 3 Movement Threshold"
+    unit_of_measurement: "cm/s"
+    min_value: 0
+    max_value: 1000
+    step: 1
+    optimistic: true
+    restore_value: true
+    initial_value: 0
+    entity_category: config
 
   - platform: template
     id: exclusion_x_begin
@@ -767,6 +803,18 @@ number:
         - lambda: 'id(sensy_component)->set_publish_interval_ms(id(publish_interval).state);'
 
   - platform: template
+    id: any_movement_threshold
+    name: "Any Movement Threshold"
+    unit_of_measurement: "cm/s"
+    min_value: 0
+    max_value: 1000
+    step: 1
+    optimistic: true
+    restore_value: true
+    initial_value: 0
+    entity_category: config
+
+  - platform: template
     id: rotation_x
     name: "Rotation X"
     unit_of_measurement: "°"
@@ -824,7 +872,13 @@ button:
 
 sensor:
   - platform: template
-    name: "Zone 1 Targets"
+    name: "All Targets Count"
+    update_interval: 100ms
+    accuracy_decimals: 0
+    lambda: |-
+      return id(sensy_component)->count_all_targets();
+  - platform: template
+    name: "Zone 1 Targets Count"
     update_interval: 100ms
     accuracy_decimals: 0
     lambda: |-
@@ -836,7 +890,7 @@ sensor:
 
 
   - platform: template
-    name: "Zone 2 Targets"
+    name: "Zone 2 Targets Count"
     update_interval: 100ms
     accuracy_decimals: 0
     lambda: |-
@@ -848,7 +902,7 @@ sensor:
 
 
   - platform: template
-    name: "Zone 3 Targets"
+    name: "Zone 3 Targets Count"
     update_interval: 100ms
     accuracy_decimals: 0
     lambda: |-
@@ -888,6 +942,16 @@ sensor:
 
 binary_sensor:
   - platform: template
+    name: "Any Presence"
+    device_class: presence
+    lambda: |-
+      return id(sensy_component)->count_all_targets() > 0;
+  - platform: template
+    name: "Any Movement"
+    device_class: motion
+    lambda: |-
+      return id(sensy_component)->movement_exceeds(id(any_movement_threshold).state);
+  - platform: template
     name: "Zone 1 Presence"
     device_class: presence
     lambda: |-
@@ -896,6 +960,16 @@ binary_sensor:
         id(zone1_y_begin).state, id(zone1_y_end).state,
         id(exclusion_x_begin).state, id(exclusion_x_end).state,
         id(exclusion_y_begin).state, id(exclusion_y_end).state) > 0;
+  - platform: template
+    name: "Zone 1 Movement"
+    device_class: motion
+    lambda: |-
+      return id(sensy_component)->zone_movement_exceeds(
+        id(zone1_x_begin).state, id(zone1_x_end).state,
+        id(zone1_y_begin).state, id(zone1_y_end).state,
+        id(exclusion_x_begin).state, id(exclusion_x_end).state,
+        id(exclusion_y_begin).state, id(exclusion_y_end).state,
+        id(zone1_movement_threshold).state);
 
   - platform: template
     name: "Zone 2 Presence"
@@ -906,6 +980,16 @@ binary_sensor:
         id(zone2_y_begin).state, id(zone2_y_end).state,
         id(exclusion_x_begin).state, id(exclusion_x_end).state,
         id(exclusion_y_begin).state, id(exclusion_y_end).state) > 0;
+  - platform: template
+    name: "Zone 2 Movement"
+    device_class: motion
+    lambda: |-
+      return id(sensy_component)->zone_movement_exceeds(
+        id(zone2_x_begin).state, id(zone2_x_end).state,
+        id(zone2_y_begin).state, id(zone2_y_end).state,
+        id(exclusion_x_begin).state, id(exclusion_x_end).state,
+        id(exclusion_y_begin).state, id(exclusion_y_end).state,
+        id(zone2_movement_threshold).state);
 
   - platform: template
     name: "Zone 3 Presence"
@@ -916,6 +1000,16 @@ binary_sensor:
         id(zone3_y_begin).state, id(zone3_y_end).state,
         id(exclusion_x_begin).state, id(exclusion_x_end).state,
         id(exclusion_y_begin).state, id(exclusion_y_end).state) > 0;
+  - platform: template
+    name: "Zone 3 Movement"
+    device_class: motion
+    lambda: |-
+      return id(sensy_component)->zone_movement_exceeds(
+        id(zone3_x_begin).state, id(zone3_x_end).state,
+        id(zone3_y_begin).state, id(zone3_y_end).state,
+        id(exclusion_x_begin).state, id(exclusion_x_end).state,
+        id(exclusion_y_begin).state, id(exclusion_y_end).state,
+        id(zone3_movement_threshold).state);
 
 text_sensor:
   - platform: wifi_info
