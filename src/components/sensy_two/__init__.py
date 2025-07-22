@@ -29,6 +29,7 @@ SENSOR_KEYS = [
 TEXT_SENSOR_KEYS = [
     "radar_firmware",
     "radar_mac",
+    "sensy_firmware",
 ]
 
 CONFIG_SCHEMA = (

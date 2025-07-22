@@ -20,6 +20,7 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
  public:
   static const size_t MAX_TARGETS = 10;
   static const size_t FIELDS = 8;
+  static constexpr const char *FIRMWARE_VERSION = "v0.0.1";
   explicit SensyTwoComponent(uart::UARTComponent *parent)
       : uart::UARTDevice(parent) {}
 
@@ -41,6 +42,13 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
     this->radar_sensitivity(sensitivity_);
     this->radar_seeking();
     this->radar_capture();
+
+    if (this->radar_firmware)
+      this->radar_firmware->publish_state("unknown");
+    if (this->radar_mac)
+      this->radar_mac->publish_state("unknown");
+    if (this->sensy_firmware)
+      this->sensy_firmware->publish_state(FIRMWARE_VERSION);
 
     if (auto *idf = static_cast<uart::IDFUARTComponent *>(this->parent_)) {
       uart_num_ = static_cast<uart_port_t>(idf->get_hw_serial_number());
@@ -196,6 +204,7 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
 
   text_sensor::TextSensor *radar_firmware = new text_sensor::TextSensor();
   text_sensor::TextSensor *radar_mac = new text_sensor::TextSensor();
+  text_sensor::TextSensor *sensy_firmware = new text_sensor::TextSensor();
 
   std::array<sensor::Sensor *, MAX_TARGETS> x_sensors_{t1_x, t2_x, t3_x, t4_x, t5_x, t6_x, t7_x, t8_x, t9_x, t10_x};
   std::array<sensor::Sensor *, MAX_TARGETS> y_sensors_{t1_y, t2_y, t3_y, t4_y, t5_y, t6_y, t7_y, t8_y, t9_y, t10_y};
