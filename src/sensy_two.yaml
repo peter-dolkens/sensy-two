@@ -495,6 +495,18 @@ sensy_two:
     unit_of_measurement: "cm"
     accuracy_decimals: 2
     icon: mdi:map-marker-distance
+  radar_firmware:
+    name: "RADAR | Firmware"
+    entity_category: diagnostic
+    icon: mdi:git
+  radar_mac:
+    name: "RADAR | MAC"
+    entity_category: diagnostic
+    icon: mdi:card-bulleted-settings
+  sensy_firmware:
+    name: "SENSY | Firmware"
+    entity_category: diagnostic
+    icon: mdi:git
 
 number:
   - platform: template
@@ -846,6 +858,34 @@ sensor:
         id(exclusion_x_begin).state, id(exclusion_x_end).state,
         id(exclusion_y_begin).state, id(exclusion_y_end).state);
 
+  - platform: internal_temperature
+    name: "ESP32 | Temperature"
+    entity_category: diagnostic
+    icon: mdi:thermometer
+    update_interval: 15s
+
+  - platform: uptime
+    name: "ESP32 | Uptime (Seconds)"
+    id: esp32_uptime_seconds
+    entity_category: diagnostic
+    icon: mdi:sort-clock-descending
+    update_interval: 15s
+    internal: true
+
+  - platform: template
+    name: "ESP32 | Uptime"
+    lambda: |-
+      int uptime = id(esp32_uptime_seconds).state;
+      int hours = uptime / 3600;
+      int minutes = (uptime % 3600) / 60;
+      int seconds = uptime % 60;
+      char buffer[10];
+      snprintf(buffer, sizeof(buffer), "%02d:%02d:%02d", hours, minutes, seconds);
+      return std::string(buffer);
+    icon: mdi:sort-clock-descending
+    entity_category: diagnostic
+    update_interval: 15s
+
 binary_sensor:
   - platform: template
     name: "Zone 1 Presence"
@@ -876,3 +916,52 @@ binary_sensor:
         id(zone3_y_begin).state, id(zone3_y_end).state,
         id(exclusion_x_begin).state, id(exclusion_x_end).state,
         id(exclusion_y_begin).state, id(exclusion_y_end).state) > 0;
+
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: "ESP32 | IP"
+      entity_category: diagnostic
+      icon: mdi:ip-network
+      update_interval: 15s
+    ssid:
+      name: "ESP32 | SSID"
+      entity_category: diagnostic
+      icon: mdi:wifi-settings
+      update_interval: 15s
+
+  - platform: template
+    name: "ESP32 | MAC"
+    entity_category: diagnostic
+    icon: mdi:card-bulleted-settings
+    lambda: |-
+      uint64_t mac = ESP.getEfuseMac();
+      char mac_str[18];
+      snprintf(mac_str, sizeof(mac_str), "%02X:%02X:%02X:%02X:%02X:%02X",
+        (uint8_t)(mac >> 40),
+        (uint8_t)(mac >> 32),
+        (uint8_t)(mac >> 24),
+        (uint8_t)(mac >> 16),
+        (uint8_t)(mac >> 8),
+        (uint8_t)(mac));
+      return std::string(mac_str);
+
+  - platform: template
+    name: "ESP32 | WiFi Strength"
+    entity_category: diagnostic
+    icon: mdi:signal-cellular-3
+    update_interval: 15s
+    lambda: |-
+      int rssi = WiFi.RSSI();
+      if (rssi < -90) {
+        return std::string("Very Weak");
+      } else if (rssi < -80) {
+        return std::string("Weak");
+      } else if (rssi < -70) {
+        return std::string("Moderate");
+      } else if (rssi < -60) {
+        return std::string("Strong");
+      } else {
+        return std::string("Very Strong");
+      }
+
