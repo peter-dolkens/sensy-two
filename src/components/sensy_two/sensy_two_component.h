@@ -587,6 +587,59 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
     return count;
   }
 
+  int count_all_targets() const {
+    int count = 0;
+    for (size_t i = 0; i < MAX_TARGETS; ++i) {
+      if (target_ids_[i] != INVALID_ID) {
+        count++;
+      }
+    }
+    return count;
+  }
+
+  bool movement_exceeds(float threshold_cm_s) const {
+    for (size_t i = 0; i < MAX_TARGETS; ++i) {
+      if (target_ids_[i] == INVALID_ID) continue;
+      float vx = raw_targets_[i].vx;
+      float vy = raw_targets_[i].vy;
+      float vz = raw_targets_[i].vz;
+      float speed_cm_s = sqrtf(vx * vx + vy * vy + vz * vz) * 100.0f;
+      if (speed_cm_s > threshold_cm_s) return true;
+    }
+    return false;
+  }
+
+  bool zone_movement_exceeds(float x0, float x1, float y0, float y1,
+                             float ex_x0, float ex_x1, float ex_y0,
+                             float ex_y1, float threshold_cm_s) const {
+    auto in_rect = [](float x, float y, float rx0, float rx1, float ry0,
+                      float ry1) {
+      float x_min = std::min(rx0, rx1);
+      float x_max = std::max(rx0, rx1);
+      float y_min = std::min(ry0, ry1);
+      float y_max = std::max(ry0, ry1);
+      return x >= x_min && x <= x_max && y >= y_min && y <= y_max;
+    };
+    for (size_t i = 0; i < MAX_TARGETS; ++i) {
+      if (target_ids_[i] == INVALID_ID) continue;
+      float x = raw_targets_[i].x;
+      float y = raw_targets_[i].y;
+      float z = raw_targets_[i].z;
+      apply_rotation(x, y, z);
+      float x_cm = x * 100.0f;
+      float y_cm = y * 100.0f;
+      if (in_rect(x_cm, y_cm, x0, x1, y0, y1) &&
+          !in_rect(x_cm, y_cm, ex_x0, ex_x1, ex_y0, ex_y1)) {
+        float vx = raw_targets_[i].vx;
+        float vy = raw_targets_[i].vy;
+        float vz = raw_targets_[i].vz;
+        float speed_cm_s = sqrtf(vx * vx + vy * vy + vz * vz) * 100.0f;
+        if (speed_cm_s > threshold_cm_s) return true;
+      }
+    }
+    return false;
+  }
+
  protected:
   void assign_persons(const std::vector<Person> &persons) {
     ESP_LOGI("SensyTwo", "Assigning %zu persons", persons.size());
