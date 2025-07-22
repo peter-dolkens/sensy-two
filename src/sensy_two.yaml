@@ -500,6 +500,7 @@ number:
   - platform: template
     id: zone1_x_begin
     name: "Zone 1 X Begin"
+    icon: mdi:arrow-collapse-left
     min_value: -1000
     initial_value: 0
     max_value: 1000
@@ -509,6 +510,7 @@ number:
   - platform: template
     id: zone1_x_end
     name: "Zone 1 X End"
+    icon: mdi:arrow-collapse-right
     min_value: -1000
     initial_value: 0
     max_value: 1000
@@ -518,6 +520,7 @@ number:
   - platform: template
     id: zone1_y_begin
     name: "Zone 1 Y Begin"
+    icon: mdi:arrow-collapse-up
     min_value: -1000
     initial_value: 0
     max_value: 1000
@@ -527,6 +530,7 @@ number:
   - platform: template
     id: zone1_y_end
     name: "Zone 1 Y End"
+    icon: mdi:arrow-collapse-down
     min_value: -1000
     initial_value: 0
     max_value: 1000
@@ -537,6 +541,7 @@ number:
   - platform: template
     id: zone2_x_begin
     name: "Zone 2 X Begin"
+    icon: mdi:arrow-collapse-left
     min_value: -1000
     initial_value: 0
     max_value: 1000
@@ -546,6 +551,7 @@ number:
   - platform: template
     id: zone2_x_end
     name: "Zone 2 X End"
+    icon: mdi:arrow-collapse-right
     min_value: -1000
     initial_value: 0
     max_value: 1000
@@ -555,6 +561,7 @@ number:
   - platform: template
     id: zone2_y_begin
     name: "Zone 2 Y Begin"
+    icon: mdi:arrow-collapse-up
     min_value: -1000
     initial_value: 0
     max_value: 1000
@@ -564,6 +571,7 @@ number:
   - platform: template
     id: zone2_y_end
     name: "Zone 2 Y End"
+    icon: mdi:arrow-collapse-down
     min_value: -1000
     initial_value: 0
     max_value: 1000
@@ -574,6 +582,7 @@ number:
   - platform: template
     id: zone3_x_begin
     name: "Zone 3 X Begin"
+    icon: mdi:arrow-collapse-left
     min_value: -1000
     initial_value: 0
     max_value: 1000
@@ -583,6 +592,7 @@ number:
   - platform: template
     id: zone3_x_end
     name: "Zone 3 X End"
+    icon: mdi:arrow-collapse-right
     min_value: -1000
     initial_value: 0
     max_value: 1000
@@ -592,6 +602,7 @@ number:
   - platform: template
     id: zone3_y_begin
     name: "Zone 3 Y Begin"
+    icon: mdi:arrow-collapse-up
     min_value: -1000
     initial_value: 0
     max_value: 1000
@@ -601,6 +612,7 @@ number:
   - platform: template
     id: zone3_y_end
     name: "Zone 3 Y End"
+    icon: mdi:arrow-collapse-down
     min_value: -1000
     initial_value: 0
     max_value: 1000
@@ -611,6 +623,7 @@ number:
   - platform: template
     id: exclusion_x_begin
     name: "Exclusion X Begin"
+    icon: mdi:arrow-collapse-left
     min_value: -1000
     initial_value: 0
     max_value: 1000
@@ -620,6 +633,7 @@ number:
   - platform: template
     id: exclusion_x_end
     name: "Exclusion X End"
+    icon: mdi:arrow-collapse-right
     min_value: -1000
     initial_value: 0
     max_value: 1000
@@ -629,6 +643,7 @@ number:
   - platform: template
     id: exclusion_y_begin
     name: "Exclusion Y Begin"
+    icon: mdi:arrow-collapse-up
     min_value: -1000
     initial_value: 0
     max_value: 1000
@@ -638,6 +653,7 @@ number:
   - platform: template
     id: exclusion_y_end
     name: "Exclusion Y End"
+    icon: mdi:arrow-collapse-down
     min_value: -1000
     initial_value: 0
     max_value: 1000
@@ -696,6 +712,7 @@ number:
     min_value: 10
     max_value: 99
     step: 1
+    icon: mdi:timer-outline
     mode: box
     unit_of_measurement: "s"
     optimistic: true
@@ -709,6 +726,7 @@ number:
   - platform: template
     id: radar_range
     name: "Detection Range"
+    icon: mdi:signal-distance-variant
     min_value: 10
     max_value: 1000
     step: 10
@@ -717,7 +735,6 @@ number:
     optimistic: true
     restore_value: true
     initial_value: 600
-    entity_category: config
     on_value:
       then:
         - lambda: 'id(sensy_component)->radar_range((int)id(radar_range).state);'
@@ -740,6 +757,8 @@ number:
   - platform: template
     id: rotation_x
     name: "Rotation X"
+    unit_of_measurement: "°"
+    icon: mdi:axis-x-rotate-clockwise
     min_value: -180
     max_value: 180
     step: 1
@@ -752,6 +771,8 @@ number:
   - platform: template
     id: rotation_y
     name: "Rotation Y"
+    unit_of_measurement: "°"
+    icon: mdi:axis-y-rotate-clockwise
     min_value: -180
     max_value: 180
     step: 1
@@ -764,6 +785,8 @@ number:
   - platform: template
     id: rotation_z
     name: "Rotation Z"
+    unit_of_measurement: "°"
+    icon: mdi:axis-z-rotate-clockwise
     min_value: -180
     max_value: 180
     step: 1
@@ -776,11 +799,13 @@ number:
 button:
   - platform: template
     name: "RADAR | Restart Module"
+    icon: mdi:restart
     on_press:
       - lambda: 'id(sensy_component)->radar_restart();'
     entity_category: diagnostic
   - platform: template
     name: "RADAR | Capture Points"
+    icon: mdi:radar
     on_press:
       - lambda: 'id(sensy_component)->radar_capture();'
     entity_category: diagnostic
