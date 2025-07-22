@@ -409,9 +409,10 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
       float angle = (distance > 0.0f) ? atan2f(x, y) * 180.0f / M_PI : 0.0f;
       float speed = sqrtf(vx * vx + vy * vy + vz * vz);
       auto r2 = [](float v) { return roundf(v * 100.0f) / 100.0f; };
+      auto r0 = [](float v) { return roundf(v); };
       state.values = {r2(x * 100), r2(y * 100), r2(z * 100), r2(angle),
-                      r2(speed * 100), 0, r2(distance * 100),
-                      raw_targets_[index].q * 1.0f};
+                      r0(speed * 100), raw_targets_[index].q * 1.0f,
+                      r2(distance * 100), raw_targets_[index].q * 1.0f};
     } else {
       state.values = {0, 0, 0, 0, 0, 0, 0, 0};
     }
