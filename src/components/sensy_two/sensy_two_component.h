@@ -93,6 +93,7 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
   void apply_settings() {
     this->radar_restart();
     this->radar_start();
+    this->radar_debug(2);
     this->radar_report_interval(report_interval_ms_);
     this->radar_monitor_interval(monitor_interval_s_);
     this->radar_heartbeat_timeout(heartbeat_interval_s_);
@@ -105,6 +106,7 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
 
   void loop() override {
     parse_ring();
+
     uint32_t now = millis();
     if (now - last_frame_ms_ > frame_timeout_ms_) {
       if (now - last_reinit_ms_ > frame_timeout_ms_) {
@@ -112,8 +114,10 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
         last_reinit_ms_ = now;
       }
     }
+
     yield();  // Allow other tasks to run
     delay(10);  // Allow some time for UART processing
+
     for (size_t i = 0; i < MAX_TARGETS; ++i) {
       maybe_publish(i);
     }
@@ -267,7 +271,7 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
   int range_cm_ = 600;
   uint32_t last_frame_ms_ = 0;
   uint32_t last_reinit_ms_ = 0;
-  uint32_t frame_timeout_ms_ = 2000;
+  uint32_t frame_timeout_ms_ = 10000;
 
   struct Person {
     uint32_t id;
@@ -412,18 +416,18 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
       float x = raw_targets_[index].x;
       float y = raw_targets_[index].y;
       float z = raw_targets_[index].z;
-      if (fabsf(x) < 1e-4f && fabsf(y) < 1e-4f && fabsf(z) < 1e-4f) {
-        // ignore zero coordinates, publish unknown
-        x_sensors_[index]->publish_state(NAN);
-        y_sensors_[index]->publish_state(NAN);
-        z_sensors_[index]->publish_state(NAN);
-        angle_sensors_[index]->publish_state(NAN);
-        speed_sensors_[index]->publish_state(NAN);
-        distance_resolution_sensors_[index]->publish_state(NAN);
-        distance_sensors_[index]->publish_state(NAN);
-        last_published_time_[index] = now;
-        return;
-      }
+      // if (fabsf(x) < 1e-4f && fabsf(y) < 1e-4f && fabsf(z) < 1e-4f) {
+      //   // ignore zero coordinates, publish unknown
+      //   x_sensors_[index]->publish_state(NAN);
+      //   y_sensors_[index]->publish_state(NAN);
+      //   z_sensors_[index]->publish_state(NAN);
+      //   angle_sensors_[index]->publish_state(NAN);
+      //   speed_sensors_[index]->publish_state(NAN);
+      //   distance_resolution_sensors_[index]->publish_state(NAN);
+      //   distance_sensors_[index]->publish_state(NAN);
+      //   last_published_time_[index] = now;
+      //   return;
+      // }
       float vx = raw_targets_[index].vx;
       float vy = raw_targets_[index].vy;
       float vz = raw_targets_[index].vz;
