@@ -86,6 +86,7 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
     this->write_str(cmd);
     delay(100);
   }
+  void set_q_threshold(uint32_t value) { q_threshold_ = value; }
   void radar_seeking() { this->write_str("AT+SEEKING\n"); delay(100); }
   void radar_restart() { this->write_str("AT+RESET\n"); delay(100); }
   void radar_capture() { this->write_str("AT+SETTING\n"); delay(100); }
@@ -273,6 +274,7 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
   uint32_t last_frame_ms_ = 0;
   uint32_t last_reinit_ms_ = 0;
   uint32_t frame_timeout_ms_ = 10000;
+  uint32_t q_threshold_ = 0;
 
   struct Person {
     uint32_t q;
@@ -667,6 +669,8 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
     std::array<bool, MAX_TARGETS> seen{};
     seen.fill(false);
     for (const auto &p : persons) {
+      if (p.q < q_threshold_)
+        continue;
       if (fabsf(p.x) < 1e-4f && fabsf(p.y) < 1e-4f && fabsf(p.z) < 1e-4f) {
         size_t idx = find_index_for_id(p.id);
         if (idx != MAX_TARGETS) {
