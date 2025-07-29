@@ -818,11 +818,11 @@ number:
     id: quality_threshold
     name: "Quality Threshold"
     min_value: 0
-    max_value: 100
+    max_value: 256
     step: 1
     optimistic: true
     restore_value: true
-    initial_value: 0
+    initial_value: 1
     entity_category: config
     on_value:
       then:

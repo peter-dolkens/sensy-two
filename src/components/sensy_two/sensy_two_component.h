@@ -669,7 +669,7 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
     std::array<bool, MAX_TARGETS> seen{};
     seen.fill(false);
     for (const auto &p : persons) {
-      if (p.q < q_threshold_)
+      if (p.q >= q_threshold_)
         continue;
       if (fabsf(p.x) < 1e-4f && fabsf(p.y) < 1e-4f && fabsf(p.z) < 1e-4f) {
         size_t idx = find_index_for_id(p.id);
