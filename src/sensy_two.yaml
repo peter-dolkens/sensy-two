@@ -815,6 +815,20 @@ number:
     entity_category: config
 
   - platform: template
+    id: quality_threshold
+    name: "Quality Threshold"
+    min_value: 0
+    max_value: 100
+    step: 1
+    optimistic: true
+    restore_value: true
+    initial_value: 0
+    entity_category: config
+    on_value:
+      then:
+        - lambda: 'id(sensy_component)->set_q_threshold((uint32_t)id(quality_threshold).state);'
+
+  - platform: template
     id: rotation_x
     name: "Rotation X"
     unit_of_measurement: "°"

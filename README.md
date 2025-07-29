@@ -55,3 +55,10 @@ matching the Sensy-One reference implementation.
 Number entities can be used to rotate the reported coordinates around the X,
 Y and Z axes. Updating these values calls `set_rotation_x_deg`,
 `set_rotation_y_deg` and `set_rotation_z_deg` on the component.
+
+### Quality Filtering
+
+Persons reported by the radar include a quality value `q`. A template number
+entity `Quality Threshold` adjusts the minimum acceptable value. The YAML
+slider updates this threshold by calling `set_q_threshold` on the component,
+and detections with a lower quality are ignored.
