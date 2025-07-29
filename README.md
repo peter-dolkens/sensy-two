@@ -50,6 +50,14 @@ entities to configure up to three detection zones and an optional exclusion
 zone. Template sensors calculate zone presence, movement and target counts
 matching the Sensy-One reference implementation.
 
+### Point Cloud Clustering
+
+When person data is not available the component can derive people positions
+directly from the point cloud. Points are clustered with a configurable
+radius and minimum point threshold. A simple gating algorithm associates the
+clusters with previously seen targets and an exponential filter smooths the
+coordinates over time.
+
 ### Orientation Settings
 
 Number entities can be used to rotate the reported coordinates around the X,

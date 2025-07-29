@@ -293,6 +293,20 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
   std::array<uint32_t, MAX_TARGETS> target_ids_{};
   std::array<uint32_t, MAX_TARGETS> target_last_seen_{};
   std::vector<Person> persons_buffer_;
+  struct Point {
+    float x, y, z;
+    int8_t v;
+    float snr;
+    float pow;
+    float dpk;
+  } __attribute__((packed));
+  std::vector<Point> points_buffer_;
+
+  float cluster_radius_ = 0.4f;            // meters
+  size_t min_cluster_points_ = 3;
+  float gating_distance_ = 0.75f;          // meters
+  float smoothing_alpha_ = 0.5f;
+  uint32_t next_person_id_ = 1;
 
   void read_uart() {
     uint8_t temp[128];
@@ -514,20 +528,21 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
           state_ = (frame_remaining_ >= 8) ? READING_TLV_HEADER : SEARCHING_HEADER;
         }
         break;
-      case READING_POINTS:
-        if (available_ring() > 0) {
-          uint8_t dump[64];
-          size_t todo = std::min<size_t>(tlv_len_ - bytes_read_, sizeof(dump));
-          todo = std::min(todo, available_ring());
-          if (read_ring(dump, todo)) {
-            bytes_read_ += todo;
+        case READING_POINTS:
+          while (available_ring() >= sizeof(Point) && bytes_read_ + sizeof(Point) <= tlv_len_) {
+            Point p;
+            if (read_ring((uint8_t *)&p, sizeof(Point))) {
+              bytes_read_ += sizeof(Point);
+              points_buffer_.push_back(p);
+            }
           }
-        }
-        if (bytes_read_ >= tlv_len_) {
-          frame_remaining_ -= tlv_len_;
-          state_ = (frame_remaining_ >= 8) ? READING_TLV_HEADER : SEARCHING_HEADER;
-        }
-        break;
+          if (bytes_read_ >= tlv_len_) {
+            process_points(points_buffer_);
+            points_buffer_.clear();
+            frame_remaining_ -= tlv_len_;
+            state_ = (frame_remaining_ >= 8) ? READING_TLV_HEADER : SEARCHING_HEADER;
+          }
+          break;
       default:
         state_ = SEARCHING_HEADER;
         break;
@@ -659,7 +674,76 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
     return false;
   }
 
- protected:
+  void process_points(const std::vector<Point> &points) {
+    struct Cluster { float x, y, z; int count; };
+    std::vector<Cluster> clusters;
+    for (const auto &pt : points) {
+      bool added = false;
+      for (auto &c : clusters) {
+        float dx = pt.x - c.x;
+        float dy = pt.y - c.y;
+        float dz = pt.z - c.z;
+        if (sqrtf(dx * dx + dy * dy + dz * dz) < cluster_radius_) {
+          c.x = (c.x * c.count + pt.x) / (c.count + 1);
+          c.y = (c.y * c.count + pt.y) / (c.count + 1);
+          c.z = (c.z * c.count + pt.z) / (c.count + 1);
+          c.count++;
+          added = true;
+          break;
+        }
+      }
+      if (!added) {
+        clusters.push_back({pt.x, pt.y, pt.z, 1});
+      }
+    }
+
+    std::vector<Person> persons;
+    std::array<bool, MAX_TARGETS> used{};
+    used.fill(false);
+    float dt = report_interval_ms_ / 1000.0f;
+
+    for (const auto &c : clusters) {
+      if (c.count < static_cast<int>(min_cluster_points_)) continue;
+      size_t best = MAX_TARGETS;
+      float best_dist = gating_distance_;
+      for (size_t i = 0; i < MAX_TARGETS; ++i) {
+        if (target_ids_[i] == INVALID_ID || used[i]) continue;
+        float dx = c.x - raw_targets_[i].x;
+        float dy = c.y - raw_targets_[i].y;
+        float dz = c.z - raw_targets_[i].z;
+        float dist = sqrtf(dx * dx + dy * dy + dz * dz);
+        if (dist < best_dist) {
+          best_dist = dist;
+          best = i;
+        }
+      }
+
+      uint32_t pid;
+      float prev_x = 0, prev_y = 0, prev_z = 0;
+      if (best != MAX_TARGETS) {
+        pid = target_ids_[best];
+        used[best] = true;
+        prev_x = raw_targets_[best].x;
+        prev_y = raw_targets_[best].y;
+        prev_z = raw_targets_[best].z;
+      } else {
+        pid = next_person_id_++;
+      }
+
+      float x = smoothing_alpha_ * c.x + (1.0f - smoothing_alpha_) * prev_x;
+      float y = smoothing_alpha_ * c.y + (1.0f - smoothing_alpha_) * prev_y;
+      float z = smoothing_alpha_ * c.z + (1.0f - smoothing_alpha_) * prev_z;
+      float vx = (x - prev_x) / dt;
+      float vy = (y - prev_y) / dt;
+      float vz = (z - prev_z) / dt;
+
+      persons.push_back({pid, static_cast<uint32_t>(c.count), x, y, z, vx, vy, vz});
+    }
+
+    assign_persons(persons);
+  }
+
+  protected:
   void assign_persons(const std::vector<Person> &persons) {
     ESP_LOGI("SensyTwo", "Assigning %zu persons", persons.size());
     last_frame_ms_ = millis();
