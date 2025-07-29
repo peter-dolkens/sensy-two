@@ -110,6 +110,7 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
     uint32_t now = millis();
     if (now - last_frame_ms_ > frame_timeout_ms_) {
       if (now - last_reinit_ms_ > frame_timeout_ms_) {
+        ESP_LOGI("SensyTwo", "Reinitializing SensyTwo due to timeout");
         apply_settings();
         last_reinit_ms_ = now;
       }
@@ -274,8 +275,8 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
   uint32_t frame_timeout_ms_ = 10000;
 
   struct Person {
-    uint32_t id;
     uint32_t q;
+    uint32_t id;
     float x, y, z;
     float vx, vy, vz;
   } __attribute__((packed));
@@ -678,7 +679,7 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
       if (idx == MAX_TARGETS) {
         idx = allocate_index_for_id(p.id);
       }
-      ESP_LOGI("SensyTwo", "Person ID: %u, Index: %zu", p.id, idx);
+      ESP_LOGI("SensyTwo", "Person ID: %u, Index: %zu, Quality: %u", p.id, idx, p.q);
       publish_target(idx, p);
       target_last_seen_[idx] = frame_no_;
       seen[idx] = true;
