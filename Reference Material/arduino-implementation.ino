@@ -128,6 +128,7 @@ void setup() {
 
   RadarSerial.printf("AT+RESET\n"); delay(100);
   RadarSerial.printf("AT+START\n"); delay(100);
+  RadarSerial.printf("AT+DEBUG=2\n"); delay(100);
   RadarSerial.printf("AT+TIME=200\n"); delay(100);   // default 100
   RadarSerial.printf("AT+MONTIME=1\n"); delay(100);  // default 1
   RadarSerial.printf("AT+HEATIME=10\n"); delay(100); // default 60
