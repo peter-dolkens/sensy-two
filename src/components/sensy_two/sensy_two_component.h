@@ -31,6 +31,8 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
   void set_rotation_x_deg(float deg) { rotation_x_ = deg * M_PI / 180.0f; }
   void set_rotation_y_deg(float deg) { rotation_y_ = deg * M_PI / 180.0f; }
   void set_rotation_z_deg(float deg) { rotation_z_ = deg * M_PI / 180.0f; }
+  void set_use_person_frames(bool use) { use_person_frames_ = use; }
+  bool get_use_person_frames() const { return use_person_frames_; }
 
   void setup() override {
     this->apply_settings();
@@ -247,7 +249,8 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
     READING_LENGTH,
     READING_TLV_HEADER,
     READING_POINTS,
-    READING_PERSONS
+    READING_PERSONS,
+    SKIPPING_TLV
   } state_ = SEARCHING_HEADER;
 
   uint8_t length_buf_[8];
@@ -272,6 +275,7 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
   uint32_t last_frame_ms_ = 0;
   uint32_t last_reinit_ms_ = 0;
   uint32_t frame_timeout_ms_ = 10000;
+  bool use_person_frames_ = true;
 
   struct Person {
     uint32_t id;
@@ -505,12 +509,13 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
           bytes_read_ = 0;
           item_index_ = 0;
           if (tlv_type_ == 0x01) {
-            state_ = READING_POINTS;
+            points_buffer_.clear();
+            state_ = use_person_frames_ ? SKIPPING_TLV : READING_POINTS;
           } else if (tlv_type_ == 0x02) {
             persons_buffer_.clear();
-            state_ = READING_PERSONS;
+            state_ = use_person_frames_ ? READING_PERSONS : SKIPPING_TLV;
           } else {
-            state_ = SEARCHING_HEADER; // Skip other TLV data
+            state_ = SKIPPING_TLV;
           }
         }
         break;
@@ -528,21 +533,32 @@ class SensyTwoComponent : public Component, public uart::UARTDevice {
           state_ = (frame_remaining_ >= 8) ? READING_TLV_HEADER : SEARCHING_HEADER;
         }
         break;
-        case READING_POINTS:
-          while (available_ring() >= sizeof(Point) && bytes_read_ + sizeof(Point) <= tlv_len_) {
-            Point p;
-            if (read_ring((uint8_t *)&p, sizeof(Point))) {
-              bytes_read_ += sizeof(Point);
-              points_buffer_.push_back(p);
-            }
+      case READING_POINTS:
+        while (available_ring() >= sizeof(Point) && bytes_read_ + sizeof(Point) <= tlv_len_) {
+          Point p;
+          if (read_ring((uint8_t *)&p, sizeof(Point))) {
+            bytes_read_ += sizeof(Point);
+            points_buffer_.push_back(p);
           }
-          if (bytes_read_ >= tlv_len_) {
-            process_points(points_buffer_);
-            points_buffer_.clear();
-            frame_remaining_ -= tlv_len_;
-            state_ = (frame_remaining_ >= 8) ? READING_TLV_HEADER : SEARCHING_HEADER;
-          }
-          break;
+        }
+        if (bytes_read_ >= tlv_len_) {
+          process_points(points_buffer_);
+          points_buffer_.clear();
+          frame_remaining_ -= tlv_len_;
+          state_ = (frame_remaining_ >= 8) ? READING_TLV_HEADER : SEARCHING_HEADER;
+        }
+        break;
+      case SKIPPING_TLV:
+        while (available_ring() > 0 && bytes_read_ < tlv_len_) {
+          uint8_t discard;
+          read_ring(&discard, 1);
+          bytes_read_++;
+        }
+        if (bytes_read_ >= tlv_len_) {
+          frame_remaining_ -= tlv_len_;
+          state_ = (frame_remaining_ >= 8) ? READING_TLV_HEADER : SEARCHING_HEADER;
+        }
+        break;
       default:
         state_ = SEARCHING_HEADER;
         break;

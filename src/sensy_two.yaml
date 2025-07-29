@@ -856,6 +856,19 @@ number:
       then:
         - lambda: 'id(sensy_component)->set_rotation_z_deg(id(rotation_z).state);'
 
+switch:
+  - platform: template
+    id: use_person_frames
+    name: "Use Person Frames"
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_ON
+    lambda: |-
+      return id(sensy_component)->get_use_person_frames();
+    turn_on_action:
+      - lambda: 'id(sensy_component)->set_use_person_frames(true);'
+    turn_off_action:
+      - lambda: 'id(sensy_component)->set_use_person_frames(false);'
+
 button:
   - platform: template
     name: "RADAR | Restart Module"
