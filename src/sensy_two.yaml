@@ -861,7 +861,7 @@ button:
     name: "RADAR | Restart Module"
     icon: mdi:restart
     on_press:
-      - lambda: 'id(sensy_component)->radar_restart();'
+      - lambda: 'id(sensy_component)->apply_settings();'
     entity_category: diagnostic
   - platform: template
     name: "RADAR | Capture Points"
